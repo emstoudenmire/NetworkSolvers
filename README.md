@@ -1,2 +1,0 @@
-# NetworkSolvers
-Solvers for ITensorNetworks
