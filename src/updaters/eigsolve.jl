@@ -1,9 +1,8 @@
-using KrylovKit: KrylovKit
+import KrylovKit
 
 function eigsolve_updater(
   operator,
   init;
-  region,
   which_eigval=:SR,
   ishermitian=true,
   tol=1e-14,

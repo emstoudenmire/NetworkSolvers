@@ -3,6 +3,7 @@ import ITensorMPS as itm
 import ITensorNetworks as itn
 using Printf
 import NetworkSolvers as ns
+using Random
 
 function main(; N=10)
   s = itn.siteinds("S=1", N)
@@ -16,11 +17,14 @@ function main(; N=10)
   H = itn.mpo(os, s)
   psi = itn.random_mps(s; link_space=4)
 
-  nsweeps = 3
+  nsweeps = 5
   cutoff = 1E-6
-  maxdim = [10, 20, 40, 80, 80]
+  maxdim = 80 #TODO: add support for arrays of maxdims, cutoffs
   outputlevel = 2
-  energy, gs_psi = ns.dmrg(H, psi; nsweeps, maxdim, cutoff, outputlevel)
+  inserter_kwargs = (; cutoff, maxdim)
+  #TODO: dmrg seems to be outputting fluctuating / random energies
+  #      is the state not being rewritten in the problem?
+  energy, gs_psi = ns.dmrg(H, psi; nsweeps, inserter_kwargs, outputlevel)
   println("Final energy = ",energy)
 
   return

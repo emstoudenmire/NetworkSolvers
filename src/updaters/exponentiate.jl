@@ -1,9 +1,9 @@
-using KrylovKit: KrylovKit
+import KrylovKit
 
 function exponentiate_updater(
   operator,
   init;
-  time_step,
+  time,
   krylovdim=30,
   maxiter=100,
   verbosity=0,
@@ -14,7 +14,7 @@ function exponentiate_updater(
 )
   result, exp_info = KrylovKit.exponentiate(
     operator,
-    time_step,
+    time,
     init;
     eager,
     krylovdim,

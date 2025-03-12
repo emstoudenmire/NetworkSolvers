@@ -1,4 +1,4 @@
-using ITensorNetworks: ITensorNetworks
+import ITensorNetworks as itn
 using Printf
 
 @kwdef mutable struct EigsolveProblem{State,Operator}
@@ -15,7 +15,7 @@ function set(E::EigsolveProblem; state=state(E), operator=operator(E), eigenvalu
   return EigsolveProblem(; state, operator, eigenvalue)
 end
 
-function updater(E::EigsolveProblem, local_tensor; kws...)
+function updater(E::EigsolveProblem, local_tensor; region, kws...)
   eigenvalue, local_tensor = eigsolve_updater(operator(E),local_tensor; kws...)
   return set(E; eigenvalue), local_tensor
 end
@@ -27,12 +27,13 @@ function region_callback(E::EigsolveProblem; region, outputlevel, kws...)
   return E
 end
 
-function eigsolve(H, init_state; nsweeps, kws...)
-  operator = ITensorNetworks.ProjTTN(H)
-  problem = EigsolveProblem(; state=init_state, operator)
-  sweep_iter = sweep_iterator(problem, fill((;),nsweeps))
-  E = alternating_update(sweep_iter; kws...)
-  return eigenvalue(E), state(E)
+function eigsolve(H, init_state; nsweeps, updater_kwargs=(;), inserter_kwargs=(;), kws...)
+  init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
+  kwargs_array = [(; sweep=sw, updater_kwargs, inserter_kwargs) for sw in 1:nsweeps]
+  sweep_iter = sweep_iterator(init_prob, kwargs_array)
+  converged_prob = alternating_update(sweep_iter; kws...)
+  return eigenvalue(converged_prob), state(converged_prob)
 end
 
 dmrg(args...; kws...) = eigsolve(args...; kws...)
+

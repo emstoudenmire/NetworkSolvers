@@ -40,6 +40,7 @@ function inserter(
     e = NamedGraphs.edgetype(psi)(first(region), last(region))
     indsTe = it.inds(psi[first(region)])
     tags = it.tags(psi, e)
+    @show cutoff
     U, C, _ = it.factorize(local_tensor, indsTe; tags, maxdim, mindim, cutoff)
     psi[first(region)] = U
   elseif length(region) == 1

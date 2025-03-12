@@ -21,7 +21,7 @@ function main(; N=10, total_time=1.0, time_step=0.1)
   maxdim = [10, 20, 40, 100, 200]
   outputlevel = 1
   inserter_kwargs = (; maxdim, cutoff)
-  res = ns.tdvp(H, psi, total_time, time_step; inserter_kwargs, outputlevel)
+  res = ns.applyexp(H, psi, 0.0:time_step:total_time; inserter_kwargs, outputlevel)
 
   return nothing
 end
