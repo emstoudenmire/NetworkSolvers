@@ -1,9 +1,10 @@
-import Graphs: AbstractGraph, edges, dst, src, vertices
+import Graphs: AbstractGraph, AbstractEdge, edges, dst, src, vertices
+import NamedGraphs: GraphsExtensions
 
-function basic_path_regions(g::AbstractGraph; sweep_kwargs...)
-  fwd_sweep = [([src(e), dst(e)], sweep_kwargs) for e in edges(g)]
-  return [fwd_sweep..., reverse(fwd_sweep)...]
-end
+#function basic_path_regions(g::AbstractGraph; sweep_kwargs...)
+#  fwd_sweep = [([src(e), dst(e)], sweep_kwargs) for e in edges(g)]
+#  return [fwd_sweep..., reverse(fwd_sweep)...]
+#end
 
 function tdvp_regions(g::AbstractGraph, time_step; updater_kwargs, sweep_kwargs...)
   fwd_up_args = (; time=(time_step/2), updater_kwargs...)
@@ -20,4 +21,53 @@ function tdvp_regions(g::AbstractGraph, time_step; updater_kwargs, sweep_kwargs.
   rev_sweep = [(reverse(rk[1]),rk[2]) for rk in reverse(fwd_sweep)]
 
   return [fwd_sweep..., rev_sweep...]
+end
+
+function overlap(edge_a::AbstractEdge, edge_b::AbstractEdge)
+  return intersect(support(edge_a), support(edge_b))
+end
+
+function support(edge::AbstractEdge)
+  return [src(edge), dst(edge)]
+end
+
+support(r) = r
+
+function forward_region(edges, which_edge; nsites=1, region_kwargs=(;))
+  if nsites == 1
+    current_edge = edges[which_edge]
+    #handle edge case
+    if current_edge == last(edges)
+      overlapping_vertex = only(
+        union([overlap(e, current_edge) for e in edges[1:(which_edge - 1)]]...)
+      )
+      nonoverlapping_vertex = only(
+        setdiff([src(current_edge), dst(current_edge)], [overlapping_vertex])
+      )
+      return [
+        ([overlapping_vertex], region_kwargs), ([nonoverlapping_vertex], region_kwargs)
+      ]
+    else
+      future_edges = edges[(which_edge + 1):end]
+      future_edges = isa(future_edges, AbstractEdge) ? [future_edges] : future_edges
+      overlapping_vertex = only(union([overlap(e, current_edge) for e in future_edges]...))
+      nonoverlapping_vertex = only(
+        setdiff([src(current_edge), dst(current_edge)], [overlapping_vertex])
+      )
+      return [([nonoverlapping_vertex], region_kwargs)]
+    end
+  elseif nsites == 2
+    current_edge = edges[which_edge]
+    return [([src(current_edge), dst(current_edge)], region_kwargs)]
+  end
+end
+
+function basic_region_plan(graph::AbstractGraph;
+    nsites,
+    root_vertex=GraphsExtensions.default_root_vertex(graph), 
+    sweep_kwargs...)
+  edges = GraphsExtensions.post_order_dfs_edges(graph, root_vertex)
+  fwd_sweep = [forward_region(edges,i; nsites, region_kwargs=sweep_kwargs) for i=1:length(edges)]
+  fwd_sweep = collect(Iterators.flatten(fwd_sweep))
+  return [fwd_sweep..., reverse(fwd_sweep)...]
 end

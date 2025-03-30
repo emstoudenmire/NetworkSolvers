@@ -21,6 +21,7 @@ function alternating_update(
   for (sweep, region_iter) in enumerate(sweep_iterator)
     prob = problem(region_iter)
     for (region, region_kwargs) in region_tuples(region_iter)
+      # TODO: maybe just don't let region callback change the problem!
       prob = region_callback(prob;
         region,
         nsweeps=length(sweep_iterator),
@@ -29,6 +30,7 @@ function alternating_update(
         region_kwargs...,
         kwargs...,
       )
+      #set(sweep_iterator; problem) #TODO
     end
     prob = sweep_callback(prob; nsweeps=length(sweep_iterator), outputlevel, sweep, kwargs...)
     #TODO need to update `problem` reference held within region iterator(s)

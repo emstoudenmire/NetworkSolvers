@@ -3,7 +3,9 @@
 # sweep_iterator
 #
 
+#SweepIterator{Problem}
 function sweep_iterator(problem, sweep_kwargs_array)
+  #problem::Problem
   return [region_iterator(problem; sweep_kwargs...) for sweep_kwargs in sweep_kwargs_array]
 end
 
@@ -22,7 +24,7 @@ step_iterator(args...; kws...) = Iterators.flatten(sweep_iterator(args...; kws..
 
 @kwdef mutable struct RegionIterator{Problem,RegionPlan}
   problem::Problem
-  region_plan::RegionPlan = region_plan(problem)
+  region_plan::RegionPlan
   which_region::Int = 1
   #extra_kwargs::NamedTuple = (;)
 end
@@ -47,10 +49,9 @@ end
 # Functions associated with RegionIterator
 #
 
-function region_iterator(problem; sweep_kwargs...)
-  return RegionIterator(; problem, region_plan=region_plan(problem; sweep_kwargs...))
+function region_iterator(problem; nsites=1, sweep_kwargs...)
+  return RegionIterator(; problem, region_plan=region_plan(problem; nsites, sweep_kwargs...))
 end
-
 
 function region_iterator_callback(problem; region, extracter_kwargs=(;), updater_kwargs=(;), inserter_kwargs=(;), kwargs...)
   problem, local_tensor = extracter(problem; region, extracter_kwargs...)
@@ -59,8 +60,7 @@ function region_iterator_callback(problem; region, extracter_kwargs=(;), updater
   return problem
 end
 
-function region_plan(problem; sweep_kwargs...) 
-  return basic_path_regions(state(problem); sweep_kwargs...)
+function region_plan(problem; nsites, sweep_kwargs...) 
+  return basic_region_plan(state(problem); nsites, sweep_kwargs...)
 end
-
 

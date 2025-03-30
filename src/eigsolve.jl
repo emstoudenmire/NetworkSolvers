@@ -27,9 +27,9 @@ function region_callback(E::EigsolveProblem; region, outputlevel, kws...)
   return E
 end
 
-function eigsolve(H, init_state; nsweeps, updater_kwargs=(;), inserter_kwargs=(;), kws...)
+function eigsolve(H, init_state; nsweeps, nsites=2, updater_kwargs=(;), inserter_kwargs=(;), kws...)
   init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
-  kwargs_array = [(; sweep=sw, updater_kwargs, inserter_kwargs) for sw in 1:nsweeps]
+  kwargs_array = [(; nsites, sweep=sw, updater_kwargs, inserter_kwargs) for sw in 1:nsweeps]
   sweep_iter = sweep_iterator(init_prob, kwargs_array)
   converged_prob = alternating_update(sweep_iter; kws...)
   return eigenvalue(converged_prob), state(converged_prob)
