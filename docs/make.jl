@@ -1,9 +1,7 @@
 using NetworkSolvers: NetworkSolvers
 using Documenter: Documenter, DocMeta, deploydocs, makedocs
 
-DocMeta.setdocmeta!(
-  NetworkSolvers, :DocTestSetup, :(using NetworkSolvers); recursive=true
-)
+DocMeta.setdocmeta!(NetworkSolvers, :DocTestSetup, :(using NetworkSolvers); recursive=true)
 
 include("make_index.jl")
 

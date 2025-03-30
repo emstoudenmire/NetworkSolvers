@@ -25,7 +25,7 @@ function main(; N=10)
   for sweep in 1:nsweeps
     println("\nSweep $sweep:")
     for (region, data) in region_iterator
-      @printf("  Region %s: energy = %.12f\n",region,data.current_energy)
+      @printf("  Region %s: energy = %.12f\n", region, data.current_energy)
     end
     println("Done with sweep $sweep")
   end

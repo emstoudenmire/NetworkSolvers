@@ -1,4 +1,4 @@
-import KrylovKit
+using KrylovKit: KrylovKit
 
 function eigsolve_updater(
   operator,
@@ -12,7 +12,7 @@ function eigsolve_updater(
   eager=false,
   kws...,
 )
-  howmany=1
+  howmany = 1
   vals, vecs, info = KrylovKit.eigsolve(
     operator,
     init,

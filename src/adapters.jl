@@ -1,5 +1,4 @@
 
-
 #
 # RepeatIterator
 #
@@ -12,10 +11,9 @@ mutable struct RepeatIterator{Iterator}
   keyword_args::Vector{<:NamedTuple}
 end
 
-function RepeatIterator(iter,n::Integer,kwargs::NamedTuple)
-  return RepeatIterator(iter,fill(kwargs,n))
+function RepeatIterator(iter, n::Integer, kwargs::NamedTuple)
+  return RepeatIterator(iter, fill(kwargs, n))
 end
-
 
 #
 # Version 1: output the initialized iterator each time
@@ -24,7 +22,7 @@ function Base.iterate(R::RepeatIterator)
   inner_next = iterate(R.iterator)
   isnothing(inner_next) && return nothing
   (item, inner_state) = inner_next
-  return item, (1,inner_state)
+  return item, (1, inner_state)
 end
 function Base.iterate(R::RepeatIterator, state)
   state = Base.iterate(keyword_args)
@@ -45,10 +43,6 @@ end
 #  return R, which
 #end
 
-
-
-
-
 #
 # TupleRegionIterator
 #
@@ -58,7 +52,6 @@ end
 # or its outputs implement some interface function that
 # generates each tuple?
 #
-
 
 mutable struct TupleRegionIterator{RegionIter}
   region_iterator::RegionIter
@@ -72,7 +65,6 @@ function Base.iterate(T::TupleRegionIterator, which=1)
   (current_region, region_kwargs) = current_region_plan(region_iterator(T))
   return (current_region, region_kwargs), last(state)
 end
-
 
 """
   region_tuples(R::RegionIterator)

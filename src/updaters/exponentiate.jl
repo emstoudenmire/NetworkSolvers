@@ -1,4 +1,4 @@
-import KrylovKit
+using KrylovKit: KrylovKit
 
 function exponentiate_updater(
   operator,

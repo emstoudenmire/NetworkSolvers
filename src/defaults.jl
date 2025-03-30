@@ -27,7 +27,9 @@ function extracter(problem; region, kws...)
 end
 
 function inserter(
-  problem, local_tensor, region;
+  problem,
+  local_tensor,
+  region;
   maxdim=default_maxdim(),
   mindim=default_mindim(),
   cutoff=default_cutoff(),
@@ -53,10 +55,7 @@ function inserter(
   return set(problem; state=psi)
 end
 
-function inserter(
-  problem, local_tensor, region::NamedGraphs.NamedEdge;
-  kws...,
-)
+function inserter(problem, local_tensor, region::NamedGraphs.NamedEdge; kws...)
   #TODO: potential bug / workaround in this function
   #      TreeTensorNetwork type does not allow copying
   #      if `is_tree(ttn)` is false. This is probably

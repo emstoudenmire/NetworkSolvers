@@ -7,18 +7,18 @@ import NamedGraphs: GraphsExtensions
 #end
 
 function tdvp_regions(g::AbstractGraph, time_step; updater_kwargs, sweep_kwargs...)
-  fwd_up_args = (; time=(time_step/2), updater_kwargs...)
-  rev_up_args = (; time=(-time_step/2), updater_kwargs...)
+  fwd_up_args = (; time=(time_step / 2), updater_kwargs...)
+  rev_up_args = (; time=(-time_step / 2), updater_kwargs...)
 
   fwd_sweep = []
   for e in edges(g)
-    push!(fwd_sweep,([src(e)], (; updater_kwargs=fwd_up_args, sweep_kwargs...)))
-    push!(fwd_sweep,(e, (; updater_kwargs=rev_up_args, sweep_kwargs...)))
+    push!(fwd_sweep, ([src(e)], (; updater_kwargs=fwd_up_args, sweep_kwargs...)))
+    push!(fwd_sweep, (e, (; updater_kwargs=rev_up_args, sweep_kwargs...)))
   end
-  push!(fwd_sweep,([dst(last(edges(g)))], (; updater_kwargs=fwd_up_args, sweep_kwargs...)))
+  push!(fwd_sweep, ([dst(last(edges(g)))], (; updater_kwargs=fwd_up_args, sweep_kwargs...)))
 
   # Reverse regions as well as ordering of regions:
-  rev_sweep = [(reverse(rk[1]),rk[2]) for rk in reverse(fwd_sweep)]
+  rev_sweep = [(reverse(rk[1]), rk[2]) for rk in reverse(fwd_sweep)]
 
   return [fwd_sweep..., rev_sweep...]
 end
@@ -62,12 +62,16 @@ function forward_region(edges, which_edge; nsites=1, region_kwargs=(;))
   end
 end
 
-function basic_region_plan(graph::AbstractGraph;
-    nsites,
-    root_vertex=GraphsExtensions.default_root_vertex(graph), 
-    sweep_kwargs...)
+function basic_region_plan(
+  graph::AbstractGraph;
+  nsites,
+  root_vertex=GraphsExtensions.default_root_vertex(graph),
+  sweep_kwargs...,
+)
   edges = GraphsExtensions.post_order_dfs_edges(graph, root_vertex)
-  fwd_sweep = [forward_region(edges,i; nsites, region_kwargs=sweep_kwargs) for i=1:length(edges)]
+  fwd_sweep = [
+    forward_region(edges, i; nsites, region_kwargs=sweep_kwargs) for i in 1:length(edges)
+  ]
   fwd_sweep = collect(Iterators.flatten(fwd_sweep))
   return [fwd_sweep..., reverse(fwd_sweep)...]
 end

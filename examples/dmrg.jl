@@ -26,24 +26,24 @@ function dmrg(; N=10, site_type="S=1")
   #TODO: dmrg seems to be outputting fluctuating / random energies
   #      is the state not being rewritten in the problem?
   energy, gs_psi = ns.dmrg(H, psi; nsweeps, inserter_kwargs, outputlevel)
-  println("Final energy = ",energy)
-  if site_type=="S=1" && N==10
+  println("Final energy = ", energy)
+  if site_type == "S=1" && N == 10
     println("Exact energy = -12.8945578")
   end
 
-  return
+  return nothing
 end
 
 function tree_dmrg()
-  tooth_lengths = [5,5]
+  tooth_lengths = [5, 5]
   c = named_comb_tree(tooth_lengths)
   s = itn.siteinds("S=1", c)
 
   os = itm.OpSum()
   for e in edges(c)
     os += "Sz", src(e), "Sz", dst(e)
-    os += 1/2, "S+", src(e), "S-", dst(e)
-    os += 1/2, "S-", src(e), "S+", dst(e)
+    os += 1 / 2, "S+", src(e), "S-", dst(e)
+    os += 1 / 2, "S-", src(e), "S+", dst(e)
   end
   H = itn.ttn(os, s)
 
@@ -57,7 +57,7 @@ function tree_dmrg()
   #TODO: dmrg seems to be outputting fluctuating / random energies
   #      is the state not being rewritten in the problem?
   energy, gs_psi = ns.dmrg(H, psi; nsweeps, inserter_kwargs, outputlevel)
-  println("Final energy = ",energy)
+  return println("Final energy = ", energy)
 end
 
 function sweep_loop_version()
@@ -82,7 +82,7 @@ function sweep_loop_version()
   for sweep in 1:nsweeps
     println("\nSweep $sweep:")
     for (region, data) in region_iterator
-      @printf("  Region %s: energy = %.12f\n",region,data.current_energy)
+      @printf("  Region %s: energy = %.12f\n", region, data.current_energy)
     end
     println("Done with sweep $sweep")
   end

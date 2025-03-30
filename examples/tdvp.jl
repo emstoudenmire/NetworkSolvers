@@ -49,11 +49,11 @@ function test_tdvp()
   @assert (nsweeps * time_step ≈ total_time)
   tdvp_iter = tdvp_region_iterator(H, psi; time_step)
 
-  szs = zeros(nsweeps,N)
+  szs = zeros(nsweeps, N)
   for sweep in 1:nsweeps
     for i in tdvp_iter
     end
-    szs[sweep,:] = itn.expect(data(tdvp_iter).state,"Sz")
+    szs[sweep, :] = itn.expect(data(tdvp_iter).state, "Sz")
   end
   println("\nResult from TDVP:")
   display(szs)
@@ -63,13 +63,13 @@ function test_tdvp()
   #
   H = prod(H)
   psi = prod(psi)
-  expH = exp(H*time_step)
-  szs_ed = zeros(nsweeps,N)
+  expH = exp(H * time_step)
+  szs_ed = zeros(nsweeps, N)
   for sweep in 1:nsweeps
-    psi = noprime(psi*expH)
+    psi = noprime(psi * expH)
     psi /= norm(psi)
-    for j=1:N
-      szs_ed[sweep,j] = scalar(dag(prime(psi,s[j]))*itm.op("Sz",s[j])*psi)
+    for j in 1:N
+      szs_ed[sweep, j] = scalar(dag(prime(psi, s[j])) * itm.op("Sz", s[j]) * psi)
     end
   end
   println("\nResult from ED:")
