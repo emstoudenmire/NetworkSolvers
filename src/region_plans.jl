@@ -6,7 +6,8 @@ import NamedGraphs: GraphsExtensions
 #  return [fwd_sweep..., reverse(fwd_sweep)...]
 #end
 
-function tdvp_regions(g::AbstractGraph, time_step; updater_kwargs, sweep_kwargs...)
+function tdvp_regions(g::AbstractGraph, time_step; nsites=1, updater_kwargs, sweep_kwargs...)
+  @assert nsites==1
   fwd_up_args = (; time=(time_step / 2), updater_kwargs...)
   rev_up_args = (; time=(-time_step / 2), updater_kwargs...)
 
@@ -23,19 +24,13 @@ function tdvp_regions(g::AbstractGraph, time_step; updater_kwargs, sweep_kwargs.
   return [fwd_sweep..., rev_sweep...]
 end
 
-function overlap(edge_a::AbstractEdge, edge_b::AbstractEdge)
-  return intersect(support(edge_a), support(edge_b))
+function overlap(ea::AbstractEdge, eb::AbstractEdge)
+  return intersect([src(ea),dst(ea)], [src(eb),dst(eb)])
 end
-
-function support(edge::AbstractEdge)
-  return [src(edge), dst(edge)]
-end
-
-support(r) = r
 
 function forward_region(edges, which_edge; nsites=1, region_kwargs=(;))
+  current_edge = edges[which_edge]
   if nsites == 1
-    current_edge = edges[which_edge]
     #handle edge case
     if current_edge == last(edges)
       overlapping_vertex = only(
@@ -57,7 +52,6 @@ function forward_region(edges, which_edge; nsites=1, region_kwargs=(;))
       return [([nonoverlapping_vertex], region_kwargs)]
     end
   elseif nsites == 2
-    current_edge = edges[which_edge]
     return [([src(current_edge), dst(current_edge)], region_kwargs)]
   end
 end

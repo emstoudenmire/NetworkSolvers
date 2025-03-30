@@ -3,9 +3,7 @@
 # sweep_iterator
 #
 
-#SweepIterator{Problem}
 function sweep_iterator(problem, sweep_kwargs_array)
-  #problem::Problem
   return [region_iterator(problem; sweep_kwargs...) for sweep_kwargs in sweep_kwargs_array]
 end
 
@@ -41,7 +39,7 @@ function Base.iterate(R::RegionIterator, which=1)
   isnothing(region_plan_state) && return nothing
   (current_region, region_kwargs), next = region_plan_state
 
-  R.problem = region_iterator_callback(problem(R); region=current_region, region_kwargs...)
+  region_iterator_action!(problem(R); region=current_region, region_kwargs...)
 
   return R, next
 end
@@ -56,13 +54,13 @@ function region_iterator(problem; nsites=1, sweep_kwargs...)
   )
 end
 
-function region_iterator_callback(
+function region_iterator_action!(
   problem; region, extracter_kwargs=(;), updater_kwargs=(;), inserter_kwargs=(;), kwargs...
 )
-  problem, local_tensor = extracter(problem; region, extracter_kwargs...)
-  problem, local_tensor = updater(problem, local_tensor; region, updater_kwargs...)
-  problem = inserter(problem, local_tensor, region; inserter_kwargs...)
-  return problem
+  local_tensor = extracter!(problem, region; extracter_kwargs..., kwargs...)
+  local_tensor = updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
+  inserter!(problem, local_tensor, region; inserter_kwargs..., kwargs...)
+  return
 end
 
 function region_plan(problem; nsites, sweep_kwargs...)

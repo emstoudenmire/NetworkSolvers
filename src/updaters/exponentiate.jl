@@ -24,5 +24,5 @@ function exponentiate_updater(
     ishermitian,
     issymmetric,
   )
-  return result
+  return result, exp_info
 end

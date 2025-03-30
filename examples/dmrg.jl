@@ -19,16 +19,15 @@ function dmrg(; N=10, site_type="S=1")
   psi = itn.random_mps(s; link_space=4)
 
   nsweeps = 8
-  cutoff = 1E-8
-  maxdim = 80 #TODO: add support for arrays of maxdims, cutoffs
+  cutoff = 1E-9
+  maxdim = 120 #TODO: add support for arrays of maxdims, cutoffs
   outputlevel = 2
   inserter_kwargs = (; cutoff, maxdim)
-  #TODO: dmrg seems to be outputting fluctuating / random energies
-  #      is the state not being rewritten in the problem?
   energy, gs_psi = ns.dmrg(H, psi; nsweeps, inserter_kwargs, outputlevel)
   println("Final energy = ", energy)
+
   if site_type == "S=1" && N == 10
-    println("Exact energy = -12.8945578")
+    println("Exact energy = -12.8945601")
   end
 
   return nothing

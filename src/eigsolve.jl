@@ -1,4 +1,5 @@
 import ITensorNetworks as itn
+import ITensors as it
 using Printf
 
 @kwdef mutable struct EigsolveProblem{State,Operator}
@@ -17,25 +18,22 @@ function set(
   return EigsolveProblem(; state, operator, eigenvalue)
 end
 
-function updater(E::EigsolveProblem, local_tensor; region, kws...)
-  eigenvalue, local_tensor = eigsolve_updater(operator(E), local_tensor; kws...)
-  return set(E; eigenvalue), local_tensor
-end
-
-function region_callback(E::EigsolveProblem; region, outputlevel, kws...)
+function updater!(E::EigsolveProblem, local_tensor, region; outputlevel, kws...)
+  E.eigenvalue, local_tensor = eigsolve_updater(operator(E), local_tensor; kws...)
   if outputlevel >= 2
     @printf("  Region %s: energy = %.12f\n", region, eigenvalue(E))
   end
-  return E
+  return local_tensor
 end
 
 function eigsolve(
-  H, init_state; nsweeps, nsites=2, updater_kwargs=(;), inserter_kwargs=(;), kws...
+  H, init_state; nsweeps, nsites=2, outputlevel=0, updater_kwargs=(;), inserter_kwargs=(;), kws...
 )
   init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
-  kwargs_array = [(; nsites, sweep=sw, updater_kwargs, inserter_kwargs) for sw in 1:nsweeps]
+  common_sweep_kwargs = (; nsites, outputlevel, updater_kwargs, inserter_kwargs)
+  kwargs_array = [(; common_sweep_kwargs..., sweep=s) for s in 1:nsweeps]
   sweep_iter = sweep_iterator(init_prob, kwargs_array)
-  converged_prob = alternating_update(sweep_iter; kws...)
+  converged_prob = alternating_update(sweep_iter; outputlevel, kws...)
   return eigenvalue(converged_prob), state(converged_prob)
 end
 

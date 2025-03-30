@@ -7,11 +7,10 @@ default_maxdim() = typemax(Int)
 default_mindim() = 1
 default_cutoff() = 0.0
 
-function extracter(problem; region, kws...)
-  psi = copy(state(problem))
+function extracter!(problem, region; kws...)
   if isa(region, Graphs.AbstractEdge)
     vsrc, vdst = Graphs.src(region), Graphs.dst(region)
-    psi = itn.orthogonalize(psi, vsrc)
+    psi = itn.orthogonalize(state(problem), vsrc)
     left_inds = it.uniqueinds(psi[vsrc], psi[vdst])
     lefttags = it.tags(psi, region)
     righttags = it.tags(psi, region)
@@ -19,14 +18,15 @@ function extracter(problem; region, kws...)
     psi[vsrc] = U
     local_tensor = S * V
   else
-    psi = itn.orthogonalize(psi, region)
+    psi = itn.orthogonalize(state(problem), region)
     local_tensor = prod(psi[v] for v in region)
   end
-  op = itn.position(operator(problem), psi, region)
-  return set(problem; state=psi, operator=op), local_tensor
+  problem.operator = itn.position(operator(problem), psi, region)
+  problem.state = psi
+  return local_tensor
 end
 
-function inserter(
+function inserter!(
   problem,
   local_tensor,
   region;
@@ -36,7 +36,7 @@ function inserter(
   normalize=false,
   kws...,
 )
-  psi = copy(state(problem))
+  psi = state(problem)
   v = last(region)
   if length(region) == 2
     e = NamedGraphs.edgetype(psi)(first(region), last(region))
@@ -52,19 +52,15 @@ function inserter(
   psi[v] = C
   psi = itn.set_ortho_region(psi, [v])
   normalize && (psi[v] /= norm(psi[v]))
-  return set(problem; state=psi)
+  problem.state = psi
+  return
 end
 
-function inserter(problem, local_tensor, region::NamedGraphs.NamedEdge; kws...)
-  #TODO: potential bug / workaround in this function
-  #      TreeTensorNetwork type does not allow copying
-  #      if `is_tree(ttn)` is false. This is probably
-  #      too restrictive, since copying is a low-level operation.
-  #      Would like to write this function more like code above,
-  #      without mutating the state referenced by `problem`.
-  #psi = copy(state(problem))
+function inserter!(problem, local_tensor, region::NamedGraphs.NamedEdge; kws...)
   psi = state(problem)
   psi[Graphs.dst(region)] *= local_tensor
-  psi = itn.set_ortho_region(psi, [Graphs.dst(region)])
-  return set(problem; state=psi)
+  problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])
+  return
 end
+
+region_printer(problem, local_tensor, region; kws...) = nothing
