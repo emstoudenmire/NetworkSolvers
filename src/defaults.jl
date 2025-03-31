@@ -62,5 +62,3 @@ function inserter!(problem, local_tensor, region::NamedGraphs.NamedEdge; kws...)
   problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])
   return
 end
-
-region_printer(problem, local_tensor, region; kws...) = nothing
