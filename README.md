@@ -19,7 +19,11 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
-These are just ideas and may change or be discarded.
+- [ ] DMRG improvements
+
+    - [ ] Subspace expansion support
+
+    - [ ] Maxdim etc. as a vector support
 
 - [ ] Add a kind of "checkdone" callback feature. Do we just do it 
     for each algorithm?
@@ -28,11 +32,6 @@ These are just ideas and may change or be discarded.
     - try to "tunnel" as much as possible from user side straight through
       to low levels like inserter, then no complexity can arise in between
     - maybe make "arg packer" functions or @kwdef structs? similar to solvers code
-
-- [ ] RegionIterator design
-
-  - [ ] Put most of the code into building the internal thing (array of callables?)
-        that will be iterated, then just have Base.iterate run over it
 
 - [ ] SweepIterator design questions
 
@@ -55,11 +54,9 @@ These are just ideas and may change or be discarded.
         I.e. one that lets one detect when each cycle is completed?
         Can we just tell people to use `cycle` if they want this behavior?
 
-- [X] How to allow `sweep_callback` to update problem
+- [ ] How to allow `sweep_callback` to update problem
       e.g. to update `current_time` field in TDVPProblem.
       (Have callbacks return problem.)
-  - [ ] --> How best to update problem (in-place? returning?) if it is 
-        stored deep in region iterator inside sweep iterator?
 
 - [ ] Best way to allow user-defined callbacks? (Alternative to Observer.)
 
@@ -79,15 +76,6 @@ These are just ideas and may change or be discarded.
 
 - [ ] Demonstrate iterator adapters, such as "take(iter, n)" that takes
       n steps at each iteration.
-
-- [X] Rename DMRG to eigsolve
-
-- [X] Is there a good pattern for simultaneously copying and
-      updating one or two fields of a struct?
-      For example the DMRGProblem updater, where all we want
-      to do is make a copy but with a different energy.
-      (In-place makes this simpler, but probably don't want that.)
-    
 
 
 ## Installation instructions
