@@ -21,9 +21,12 @@ function dmrg(; N=10, site_type="S=1")
   nsweeps = 8
   cutoff = 1E-9
   maxdim = 120 #TODO: add support for arrays of maxdims, cutoffs
+  nsites = 2
   outputlevel = 2
   inserter_kwargs = (; cutoff, maxdim)
-  energy, gs_psi = ns.dmrg(H, psi; nsweeps, inserter_kwargs, outputlevel)
+  @time begin
+    energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, outputlevel)
+  end
   println("Final energy = ", energy)
 
   if site_type == "S=1" && N == 10

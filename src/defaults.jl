@@ -21,8 +21,16 @@ function extracter!(problem, region; kws...)
     psi = itn.orthogonalize(state(problem), region)
     local_tensor = prod(psi[v] for v in region)
   end
-  problem.operator = itn.position(operator(problem), psi, region)
   problem.state = psi
+
+  return local_tensor
+end
+
+subspace_expand!(problem, local_tensor, region; kws...) = local_tensor
+
+function prepare_subspace!(problem, local_tensor, region; prev_region=nothing, kws...)
+  local_tensor = subspace_expand!(problem, local_tensor, region; prev_region, kws...)
+  problem.operator = itn.position(operator(problem), state(problem), region)
   return local_tensor
 end
 
