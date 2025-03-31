@@ -77,6 +77,27 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 - [ ] Demonstrate iterator adapters, such as "take(iter, n)" that takes
       n steps at each iteration.
 
+## Review of Julia iteration interface
+
+Code such as
+
+```
+for item in iter
+  # body
+end
+```
+
+is lowered to
+
+```
+next = iterate(iter)
+while !isnothing(next)
+  (item, state) = next
+  # body
+  next = iterate(iter, state)
+end
+```
+
 
 ## Installation instructions
 
