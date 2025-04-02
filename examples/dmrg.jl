@@ -52,13 +52,11 @@ function tree_dmrg()
   psi = itn.random_mps(s; link_space=4)
 
   nsweeps = 8
-  cutoff = 1E-6
-  maxdim = 80 #TODO: add support for arrays of maxdims, cutoffs
+  cutoff = 1E-9
+  maxdim = 120
   outputlevel = 2
   nsites = 2
   inserter_kwargs = (; cutoff, maxdim)
-  #TODO: dmrg seems to be outputting fluctuating / random energies
-  #      is the state not being rewritten in the problem?
   energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, outputlevel)
   return println("Final energy = ", energy)
 end
