@@ -61,12 +61,12 @@ function inserter!(
   psi = itn.set_ortho_region(psi, [v])
   normalize && (psi[v] /= norm(psi[v]))
   problem.state = psi
-  return
+  return nothing
 end
 
 function inserter!(problem, local_tensor, region::NamedGraphs.NamedEdge; kws...)
   psi = state(problem)
   psi[Graphs.dst(region)] *= local_tensor
   problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])
-  return
+  return nothing
 end

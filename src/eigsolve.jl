@@ -27,7 +27,14 @@ function updater!(E::EigsolveProblem, local_tensor, region; outputlevel, kws...)
 end
 
 function eigsolve(
-  H, init_state; nsweeps, nsites=2, outputlevel=0, updater_kwargs=(;), inserter_kwargs=(;), kws...
+  H,
+  init_state;
+  nsweeps,
+  nsites=2,
+  outputlevel=0,
+  updater_kwargs=(;),
+  inserter_kwargs=(;),
+  kws...,
 )
   init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
   common_sweep_kwargs = (; nsites, outputlevel, updater_kwargs, inserter_kwargs)

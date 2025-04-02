@@ -46,7 +46,9 @@ function range_finder(linear_map, random_vector; domain_size=typemax(Int), kws..
   v = random_vector()
   vsize = prod(size(v))
   if (domain_size < typemax(Int)) && vsize != domain_size
-    error("length of random_vector() output (=$(length(v))) should equal domain_size (=$domain_size)")
+    error(
+      "length of random_vector() output (=$(length(v))) should equal domain_size (=$domain_size)",
+    )
   end
   sample_from_range() = linear_map(random_vector())
   return range_finder(sample_from_range; domain_size=vsize, kws...)
