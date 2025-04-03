@@ -3,9 +3,9 @@ default_region_callback(problem; kws...) = nothing
 
 default_sweep_callback(problem; kws...) = nothing
 
-function default_sweep_printer(problem; outputlevel, sweep, kws...)
+function default_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
   if outputlevel >= 1
-    println("Done with sweep $sweep")
+    println("Done with sweep $sweep/$nsweeps")
     #println(" CPU time=", round(sweep_time; digits=3))
     flush(stdout)
   end

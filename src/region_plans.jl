@@ -39,7 +39,8 @@ function tdvp_regions(
 
   # Reverse regions as well as ordering of regions:
   rev_sweep = [(reverse(rk[1]), rk[2]) for rk in reverse(fwd_sweep)]
-  rev_sweep[end] = (last(rev_sweep)[1], (; updater_kwargs=step_args, sweep_kwargs...))
+  last_region = (first(last(rev_sweep)), (; updater_kwargs=step_args, sweep_kwargs...))
+  rev_sweep = [rev_sweep[1:(end - 1)]; last_region]
 
   return [fwd_sweep..., rev_sweep...]
 end
