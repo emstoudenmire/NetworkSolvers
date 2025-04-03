@@ -19,11 +19,9 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
-- [ ] DMRG improvements
-
-    - [ ] Subspace expansion support
-
-    - [ ] Maxdim etc. as a vector support
+- [X] DMRG improvements
+    - [X] Subspace expansion support
+    - [X] Maxdim etc. as a vector support
 
 - [ ] Add a kind of "checkdone" callback feature. Do we just do it 
     for each algorithm?

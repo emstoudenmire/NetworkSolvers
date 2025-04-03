@@ -1,6 +1,6 @@
 import ITensors as it
 import ITensorNetworks as itn
-using NamedGraphs: NamedGraphs
+import NamedGraphs as ng
 using Graphs: Graphs
 
 default_maxdim() = typemax(Int)
@@ -34,20 +34,27 @@ function prepare_subspace!(problem, local_tensor, region; prev_region=nothing, k
   return local_tensor
 end
 
+get_or_last(x, i::Integer) = (i >= length(x)) ? last(x) : x[i]
+
 function inserter!(
   problem,
   local_tensor,
   region;
+  cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
-  cutoff=default_cutoff(),
   normalize=false,
+  sweep,
   kws...,
 )
+  cutoff = get_or_last(cutoff, sweep)
+  mindim = get_or_last(mindim, sweep)
+  maxdim = get_or_last(maxdim, sweep)
+
   psi = state(problem)
   v = last(region)
   if length(region) == 2
-    e = NamedGraphs.edgetype(psi)(first(region), last(region))
+    e = ng.edgetype(psi)(first(region), last(region))
     indsTe = it.inds(psi[first(region)])
     tags = it.tags(psi, e)
     U, C, _ = it.factorize(local_tensor, indsTe; tags, maxdim, mindim, cutoff)
@@ -64,7 +71,7 @@ function inserter!(
   return nothing
 end
 
-function inserter!(problem, local_tensor, region::NamedGraphs.NamedEdge; kws...)
+function inserter!(problem, local_tensor, region::ng.NamedEdge; kws...)
   psi = state(problem)
   psi[Graphs.dst(region)] *= local_tensor
   problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])

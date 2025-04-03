@@ -20,7 +20,7 @@ function dmrg(; N=10, site_type="S=1")
 
   nsweeps = 8
   cutoff = 1E-9
-  maxdim = 120 #TODO: add support for arrays of maxdims, cutoffs
+  maxdim = [10,40,80,120]
   nsites = 2
   outputlevel = 2
   inserter_kwargs = (; cutoff, maxdim)
@@ -37,7 +37,7 @@ function dmrg(; N=10, site_type="S=1")
 end
 
 function tree_dmrg()
-  tooth_lengths = [5, 5]
+  tooth_lengths = [5, 5, 5]
   c = named_comb_tree(tooth_lengths)
   s = itn.siteinds("S=1", c)
 
@@ -51,12 +51,14 @@ function tree_dmrg()
 
   psi = itn.random_mps(s; link_space=4)
 
-  nsweeps = 8
+  nsweeps = 14
   cutoff = 1E-9
-  maxdim = 120
+  maxdim = 50
   outputlevel = 2
-  nsites = 2
+  nsites = 1
   inserter_kwargs = (; cutoff, maxdim)
+  # TODO: 1-site and 2-site DMRG giving different energies
+  #       is 1 site skipping a site? Is 2 site skipping any bonds?
   energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, outputlevel)
   return println("Final energy = ", energy)
 end
