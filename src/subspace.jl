@@ -26,7 +26,9 @@ function subspace_expand!(
   psi = state(problem)
   A = psi[prev_vertex]
 
-  next_vertex = only(filter(v -> (it.hascommoninds(psi[v], A)), region))
+  next_vertices = filter(v -> (it.hascommoninds(psi[v], A)), region)
+  isempty(next_vertices) && return local_tensor
+  next_vertex = only(next_vertices)
   C = psi[next_vertex]
 
   # Analyze indices of A
