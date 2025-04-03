@@ -15,8 +15,17 @@ function region_plan(tdvp::TDVPProblem; nsites, time_step, sweep_kwargs...)
   return tdvp_regions(state(tdvp), time_step; nsites, sweep_kwargs...)
 end
 
-function updater!(T::TDVPProblem, local_tensor, region; time_step, dt, outputlevel, kws...)
-  local_tensor, info = exponentiate_updater(operator(T), time_step, local_tensor; kws...)
+function updater!(
+  T::TDVPProblem,
+  local_tensor,
+  region;
+  time_step,
+  dt,
+  solver=exponentiate_solver,
+  outputlevel,
+  kws...,
+)
+  local_tensor, info = solver(operator(T), time_step, local_tensor; kws...)
   T.current_time += dt
   if outputlevel >= 2 && abs(dt) > 0.0
     @printf("  Current time = %s\n", current_time(T))

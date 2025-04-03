@@ -12,8 +12,10 @@ eigenvalue(E::EigsolveProblem) = E.eigenvalue
 state(E::EigsolveProblem) = E.state
 operator(E::EigsolveProblem) = E.operator
 
-function updater!(E::EigsolveProblem, local_tensor, region; outputlevel, kws...)
-  E.eigenvalue, local_tensor = eigsolve_updater(operator(E), local_tensor; kws...)
+function updater!(
+  E::EigsolveProblem, local_tensor, region; outputlevel, solver=eigsolve_solver, kws...
+)
+  E.eigenvalue, local_tensor = solver(operator(E), local_tensor; kws...)
   if outputlevel >= 2
     @printf("  Region %s: energy = %.12f\n", region, eigenvalue(E))
   end

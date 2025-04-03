@@ -1,6 +1,6 @@
 using KrylovKit: KrylovKit
 
-function exponentiate_updater(
+function exponentiate_solver(
   operator,
   time,
   init;

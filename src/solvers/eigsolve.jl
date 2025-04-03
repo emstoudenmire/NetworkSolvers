@@ -1,6 +1,6 @@
 using KrylovKit: KrylovKit
 
-function eigsolve_updater(
+function eigsolve_solver(
   operator,
   init;
   which_eigval=:SR,

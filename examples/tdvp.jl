@@ -5,7 +5,22 @@ using Printf
 using Random
 import NetworkSolvers as ns
 
-function main(; N=10, total_time=1.0, time_step=0.1)
+function rk2_solver(H, t, ψ0; kws...)
+  Hψ = H(ψ0)
+  H2ψ = H(Hψ)
+  return (ψ0+t*Hψ+(t^2/2)*H2ψ), (;)
+end
+
+function rk4_solver(H, t, ψ0; kws...)
+  k1 = H(ψ0)
+  k2 = k1+(t/2)*H(k1)
+  k3 = k1+(t/2)*H(k2)
+  k4 = k1+t*H(k3)
+  return ψ0+(t/6)*(k1 + 2*k2 + 2*k3 + k4), (;)
+end
+
+function main(; N=10, total_time=1.0, time_step=0.01)
+  Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
   os = itm.OpSum()
@@ -15,13 +30,19 @@ function main(; N=10, total_time=1.0, time_step=0.1)
     os += 0.5, "S-", j, "S+", j + 1
   end
   H = itn.mpo(os, s)
-  psi = itn.random_mps(s; link_space=4)
+  psi = itn.random_mps(s; link_space=16)
 
-  cutoff = 1E-6
+  cutoff = 1E-11
   maxdim = [10, 20, 40, 100, 200]
   outputlevel = 2
   inserter_kwargs = (; maxdim, cutoff)
   res = ns.applyexp(H, psi, 0.0:time_step:total_time; inserter_kwargs, outputlevel)
+
+  # Using RK solver
+  updater_kwargs = (; solver=rk4_solver)
+  res_rk4 = ns.applyexp(H, psi, 0.0:time_step:total_time; inserter_kwargs, updater_kwargs, outputlevel)
+
+  @show inner(res,res_rk4)
 
   return nothing
 end

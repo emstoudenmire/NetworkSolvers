@@ -1,7 +1,7 @@
 module NetworkSolvers
 
-include("updaters/eigsolve.jl")
-include("updaters/exponentiate.jl")
+include("solvers/eigsolve.jl")
+include("solvers/exponentiate.jl")
 
 include("sketched_linear_algebra/range_finder.jl")
 
