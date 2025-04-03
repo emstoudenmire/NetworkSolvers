@@ -20,7 +20,7 @@ function dmrg(; N=10, site_type="S=1")
 
   nsweeps = 8
   cutoff = 1E-9
-  maxdim = [10,40,80,120]
+  maxdim = [10, 40, 80, 120]
   nsites = 2
   outputlevel = 2
   inserter_kwargs = (; cutoff, maxdim)
