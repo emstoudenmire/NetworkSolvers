@@ -1,6 +1,6 @@
 import Graphs: AbstractGraph, AbstractEdge, edges, dst, src, vertices
-import NamedGraphs.GraphsExtensions: default_root_vertex, post_order_dfs_edges, post_order_dfs_vertices
-
+import NamedGraphs.GraphsExtensions:
+  default_root_vertex, post_order_dfs_edges, post_order_dfs_vertices
 
 function basic_region_plan(
   graph::AbstractGraph; nsites, root_vertex=default_root_vertex(graph), sweep_kwargs...
@@ -10,16 +10,19 @@ function basic_region_plan(
     fwd_sweep = [([v], sweep_kwargs) for v in vertices]
   elseif nsites == 2
     edges = post_order_dfs_edges(graph, root_vertex)
-    fwd_sweep = [([src(e),dst(e)], sweep_kwargs) for e in edges]
+    fwd_sweep = [([src(e), dst(e)], sweep_kwargs) for e in edges]
   end
   return [fwd_sweep..., reverse(fwd_sweep)...]
 end
 
 # TODO: add 1-site and also higher-order sweeping plans
 function tdvp_regions(
-  graph::AbstractGraph, time_step; 
+  graph::AbstractGraph,
+  time_step;
   root_vertex=default_root_vertex(graph),
-  nsites=1, updater_kwargs, sweep_kwargs...
+  nsites=1,
+  updater_kwargs,
+  sweep_kwargs...,
 )
   @assert nsites == 1
   fwd_up_args = (; time=(time_step / 2), updater_kwargs...)
