@@ -27,7 +27,7 @@ function tdvp_regions(
   @assert nsites == 1
   fwd_up_args = (; time_step=(time_step / 2), dt=0.0, updater_kwargs...)
   rev_up_args = (; time_step=(-time_step / 2), dt=0.0, updater_kwargs...)
-  step_args = (; time_step=(-time_step / 2), dt=time_step, updater_kwargs...)
+  step_args = (; time_step=(time_step / 2), dt=time_step, updater_kwargs...)
 
   fwd_sweep = []
   edges = post_order_dfs_edges(graph, root_vertex)
