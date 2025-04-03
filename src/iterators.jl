@@ -3,12 +3,12 @@
 # sweep_iterator
 #
 
-function sweep_iterator(problem, sweep_kws::Array)
-  return [region_iterator(problem; sweep=s, sweep_kws[s]...) for s=1:length(sweep_kws)]
+function sweep_iterator(problem, sweep_kws)
+  return [region_iterator(problem; sweep=s, kws...) for (s, kws) in enumerate(sweep_kws)]
 end
 
-function sweep_iterator(problem, nsweeps::Integer)
-  return sweep_iterator(problem, Iterators.repeated((;), nsweeps))
+function sweep_iterator(problem, nsweeps::Integer; sweep_kws...)
+  return sweep_iterator(problem, Iterators.repeated(sweep_kws, nsweeps))
 end
 
 #
@@ -67,11 +67,11 @@ function region_iterator_action!(
   sweep,
   kwargs...,
 )
-  local_tensor = extracter!(problem, region; sweep, extracter_kwargs..., kwargs...)
+  local_tensor = extracter!(problem, region; extracter_kwargs..., kwargs...)
   local_tensor = prepare_subspace!(
-    problem, local_tensor, region; sweep, prev_region, extracter_kwargs..., kwargs...
+    problem, local_tensor, region; prev_region, extracter_kwargs..., kwargs...
   )
-  local_tensor = updater!(problem, local_tensor, region; sweep, updater_kwargs..., kwargs...)
+  local_tensor = updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
   inserter!(problem, local_tensor, region; sweep, inserter_kwargs..., kwargs...)
   return nothing
 end
