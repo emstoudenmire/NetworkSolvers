@@ -25,8 +25,9 @@ function tdvp_regions(
   sweep_kwargs...,
 )
   @assert nsites == 1
-  fwd_up_args = (; time=(time_step / 2), updater_kwargs...)
-  rev_up_args = (; time=(-time_step / 2), updater_kwargs...)
+  fwd_up_args = (; time_step=(time_step / 2), dt=0.0, updater_kwargs...)
+  rev_up_args = (; time_step=(-time_step / 2), dt=0.0, updater_kwargs...)
+  step_args = (; time_step=(-time_step / 2), dt=time_step, updater_kwargs...)
 
   fwd_sweep = []
   edges = post_order_dfs_edges(graph, root_vertex)
@@ -38,6 +39,7 @@ function tdvp_regions(
 
   # Reverse regions as well as ordering of regions:
   rev_sweep = [(reverse(rk[1]), rk[2]) for rk in reverse(fwd_sweep)]
+  rev_sweep[end] = (last(rev_sweep)[1], (; updater_kwargs=step_args, sweep_kwargs...))
 
   return [fwd_sweep..., rev_sweep...]
 end

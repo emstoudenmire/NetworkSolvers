@@ -19,7 +19,7 @@ function main(; N=10, total_time=1.0, time_step=0.1)
 
   cutoff = 1E-6
   maxdim = [10, 20, 40, 100, 200]
-  outputlevel = 1
+  outputlevel = 2
   inserter_kwargs = (; maxdim, cutoff)
   res = ns.applyexp(H, psi, 0.0:time_step:total_time; inserter_kwargs, outputlevel)
 

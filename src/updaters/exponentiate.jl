@@ -2,8 +2,8 @@ using KrylovKit: KrylovKit
 
 function exponentiate_updater(
   operator,
-  init;
   time,
+  init;
   krylovdim=30,
   maxiter=100,
   verbosity=0,
