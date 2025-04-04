@@ -19,7 +19,8 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
-- [X] DMRG improvements
+- [ ] DMRG improvements
+    - [ ] QN subspace expansion (check Andrea's fork of SketchedLinearAlgebra)
     - [X] Subspace expansion support
     - [X] Maxdim etc. as a vector support
 

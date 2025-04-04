@@ -2,6 +2,7 @@ module NetworkSolvers
 
 include("solvers/eigsolve.jl")
 include("solvers/exponentiate.jl")
+include("solvers/runge_kutta.jl")
 
 include("sketched_linear_algebra/range_finder.jl")
 

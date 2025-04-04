@@ -5,14 +5,6 @@ using Printf
 using Random
 import NetworkSolvers as ns
 
-function rk4_solver(H, t, ψ0; kws...)
-  k1 = H(ψ0)
-  k2 = k1 + (t / 2) * H(k1)
-  k3 = k1 + (t / 2) * H(k2)
-  k4 = k1 + t * H(k3)
-  return ψ0 + (t / 6) * (k1 + 2 * k2 + 2 * k3 + k4), (;)
-end
-
 function main(; N=10, total_time=-1.0, time_step=-0.1)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
@@ -34,7 +26,7 @@ function main(; N=10, total_time=-1.0, time_step=-0.1)
   res = ns.applyexp(H, psi0, time_range; inserter_kwargs, outputlevel)
 
   # Using RK solver
-  updater_kwargs = (; solver=rk4_solver)
+  updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
   res_rk4 = ns.applyexp(
     H, psi0, 0.0:time_step:total_time; inserter_kwargs, updater_kwargs, outputlevel
   )
