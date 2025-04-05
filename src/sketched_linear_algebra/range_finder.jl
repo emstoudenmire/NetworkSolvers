@@ -1,4 +1,8 @@
 
+"""
+  Version of range_finder calling a `sample_from_range` function
+  that returns random vectors (range elements) one by one.
+"""
 function range_finder(
   sample_from_range;
   cutoff=0.0, # experimental feature
@@ -42,6 +46,12 @@ function range_finder(
   return range_vectors
 end
 
+
+"""
+  Version of range_finder calling a `random_vector` function
+  that returns random vectors (domain elements) one by one
+  and plugs them into a `linear_map` function.
+"""
 function range_finder(linear_map, random_vector; domain_size=typemax(Int), kws...)
   v = random_vector()
   vsize = prod(size(v))
@@ -53,3 +63,5 @@ function range_finder(linear_map, random_vector; domain_size=typemax(Int), kws..
   sample_from_range() = linear_map(random_vector())
   return range_finder(sample_from_range; domain_size=vsize, kws...)
 end
+
+
