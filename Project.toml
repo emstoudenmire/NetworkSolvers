@@ -1,7 +1,7 @@
 name = "NetworkSolvers"
 uuid = "31404548-2b48-4190-b5cd-dc6b4eddfaec"
 authors = ["ITensor developers <support@itensor.org> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
@@ -15,7 +15,7 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 [compat]
 Graphs = "1.12.0"
 ITensorNetworks = "0.13.1"
-ITensors = "0.8.0"
+ITensors = "0.8.0, 0.9"
 IterTools = "1.10.0"
 KrylovKit = "0.6, 0.7, 0.8"
 NamedGraphs = "0.6.4"
