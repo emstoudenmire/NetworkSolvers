@@ -4,19 +4,24 @@ import ITensorNetworks as itn
 using Printf
 import NetworkSolvers as ns
 using Random
-using Graphs: edges, dst, src
+using Graphs: edges, dst, src, vertices
 using NamedGraphs.NamedGraphGenerators: named_comb_tree
 
-function dmrg(; N=10, site_type="S=1")
+function dmrg(; N=10, site_type="S=1", conserve_qns=false)
   os = itm.OpSum()
   for j in 1:(N - 1)
     os += "Sz", j, "Sz", j + 1
     os += 0.5, "S+", j, "S-", j + 1
     os += 0.5, "S-", j, "S+", j + 1
   end
-  s = itn.siteinds(site_type, N)
+  s = itn.siteinds(site_type, N; conserve_qns)
   H = itn.mpo(os, s)
-  psi = itn.random_mps(s; link_space=4)
+
+  state = Dict{Int,String}()
+  for v in vertices(H)
+    state[v] = iseven(v) ? "Up" : "Dn"
+  end
+  psi = itn.ttn(state,s)
 
   nsweeps = 8
   cutoff = 1E-9
