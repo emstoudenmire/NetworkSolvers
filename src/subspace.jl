@@ -1,7 +1,10 @@
 using ITensors:
+  combiner,
+  combinedind,
   commonind,
   dag,
   dim,
+  dir,
   directsum,
   dot,
   flux,
@@ -12,8 +15,10 @@ using ITensors:
   onehot,
   pause,
   space,
+  svd,
   uniqueinds,
   random_itensor,
+  QN,
   qr
 
 expand_space(χ::Integer, expansion_factor) = max(χ+1,floor(Int,expansion_factor*χ))
@@ -22,32 +27,13 @@ function expand_space(χs::Vector{<:Pair}, expansion_factor)
   return [q=>expand_space(d,expansion_factor) for (q,d) in χs]
 end
 
-total_space(spaces::Vector{<:Integer}) = prod(spaces)
-
-function total_space(spaces::Vector)
-  merge_space = Dict{QN,Int}()
-  for it in Iterators.product(spaces)
-    qtot = QN()
-    dtot = 1
-    for qd in it
-      qtot += qd[1]
-      dtot *= qd[2]
-    end
-    merge_space[qtot] += dtot
-  end
-  @show merge_space
-  return [q=>d for (q,d) in merge_space]
-end
-
-function expand_space(a, basis_inds, expansion_factor)
-  basis_space = total_space(space.(basis_inds))
-  @show basis_space
-  max_expand = dim_basis - dim(a)
-end
-
 function subspace_expand!(
-  problem::EigsolveProblem, local_tensor, region; prev_region, expansion_factor=1.1, kws...
+    problem::EigsolveProblem, local_tensor, region; prev_region, cutoff=default_cutoff(), maxdim=default_maxdim(), mindim=default_mindim(), expansion_factor=1.2, sweep, kws...
 )
+  cutoff = get_or_last(cutoff, sweep)
+  mindim = get_or_last(mindim, sweep)
+  maxdim = get_or_last(maxdim, sweep)
+
   if isnothing(prev_region) || isa(region, AbstractEdge)
     return local_tensor
   end
@@ -70,23 +56,21 @@ function subspace_expand!(
   isnothing(a) && return local_tensor
   basis_inds = uniqueinds(A, C)
 
-  #------------------------
-
-  # Determine maximum value of num_expand
-  #dim_basis = prod(dim.(basis_inds))
-  #max_expand = dim_basis - dim(a)
-
-  ax_space = expand_space(a,basis_inds,expansion_factor)
-  pause()
+  ci = combinedind(combiner(basis_inds...))
+  ax_space = expand_space(space(ci),expansion_factor)
   ax = Index(ax_space,"ax")
-  #(num_expand <= 0) && return local_tensor
 
   linear_map(w) = (w - A * (dag(A) * w))
+  Y = linear_map(random_itensor(basis_inds,dag(ax)))
+  maxdim_goal = ceil(Int,expansion_factor*dim(a))
+  maxdim_goal = min(maxdim_goal,maxdim)
+  Ux_maxdim = maxdim_goal-dim(a)
+  (norm(Y) <= 1E-15 || Ux_maxdim <= 0) && return local_tensor
+  Ux,S,V = svd(Y, basis_inds; cutoff=1E-14, maxdim=Ux_maxdim, lefttags="ux,Link")
 
-  Y = linear_map(random_itensor(basis_inds,ax))
-  Q,R = qr(Y,basis_inds)
-  q = commonind(Q,R)
-  Ax, sa = directsum(A => a, Q => q)
+  Ux = linear_map(Ux)
+  ux = commonind(Ux,S)
+  Ax, sa = directsum(A => a, Ux => ux)
 
   expander = dag(Ax) * A
   psi[prev_vertex] = Ax

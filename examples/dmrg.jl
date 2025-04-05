@@ -7,7 +7,7 @@ using Random
 using Graphs: edges, dst, src, vertices
 using NamedGraphs.NamedGraphGenerators: named_comb_tree
 
-function dmrg(; N=10, site_type="S=1", conserve_qns=false)
+function dmrg(; N=10, nsites=2, site_type="S=1", conserve_qns=false)
   os = itm.OpSum()
   for j in 1:(N - 1)
     os += "Sz", j, "Sz", j + 1
@@ -24,13 +24,13 @@ function dmrg(; N=10, site_type="S=1", conserve_qns=false)
   psi = itn.ttn(state,s)
 
   nsweeps = 8
-  cutoff = 1E-9
+  cutoff = 1E-10
   maxdim = [10, 40, 80, 120]
-  nsites = 2
   outputlevel = 2
   inserter_kwargs = (; cutoff, maxdim)
+  subspace_kwargs = (; cutoff, maxdim, expansion_factor=2.0)
   @time begin
-    energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, outputlevel)
+    energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel)
   end
   println("Final energy = ", energy)
 
