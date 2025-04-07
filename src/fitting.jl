@@ -89,7 +89,7 @@ end
 
 function updater!(F::FittingProblem, local_tensor, region; outputlevel, kws...)
   n = (local_tensor * dag(local_tensor))[]
-  F.squared_scalar = n * conj(n) / n
+  F.squared_scalar = n / sqrt(n)
   if outputlevel >= 2
     @printf("  Region %s: squared overlap = %.12f\n", region, squared_scalar(F))
   end
