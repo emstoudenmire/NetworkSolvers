@@ -46,7 +46,6 @@ function range_finder(
   return range_vectors
 end
 
-
 """
   Version of range_finder calling a `random_vector` function
   that returns random vectors (domain elements) one by one
@@ -63,5 +62,3 @@ function range_finder(linear_map, random_vector; domain_size=typemax(Int), kws..
   sample_from_range() = linear_map(random_vector())
   return range_finder(sample_from_range; domain_size=vsize, kws...)
 end
-
-

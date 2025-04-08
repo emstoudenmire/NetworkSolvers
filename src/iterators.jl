@@ -24,26 +24,27 @@ step_iterator(args...; kws...) = Iterators.flatten(sweep_iterator(args...; kws..
 @kwdef mutable struct RegionIterator{Problem,RegionPlan}
   problem::Problem
   region_plan::RegionPlan
-  which_region_plan::Int = 1
-  prev_region = nothing
-  #extra_kwargs::NamedTuple = (;)
+  which_region::Int = 1
 end
 
 problem(R::RegionIterator) = R.problem
-current_region_plan(R::RegionIterator) = R.region_plan[R.which_region_plan]
-current_region(R::RegionIterator) = R.region_plan[R.which_region_plan][1]
-region_kwargs(R::RegionIterator) = R.region_plan[R.which_region_plan][2]
+current_region_plan(R::RegionIterator) = R.region_plan[R.which_region]
+current_region(R::RegionIterator) = R.region_plan[R.which_region][1]
+region_kwargs(R::RegionIterator) = R.region_plan[R.which_region][2]
 
 function Base.iterate(R::RegionIterator, which=1)
-  R.which_region_plan = which
+  R.which_region = which
   region_plan_state = iterate(R.region_plan, which)
   isnothing(region_plan_state) && return nothing
   (current_region, region_kwargs), next = region_plan_state
 
   region_iterator_action!(
-    problem(R); region=current_region, prev_region=R.prev_region, region_kwargs...
+    problem(R);
+    region=current_region,
+    region_plan=R.region_plan,
+    which_region=R.which_region,
+    region_kwargs...,
   )
-  R.prev_region = current_region
   return R, next
 end
 
@@ -60,7 +61,6 @@ end
 function region_iterator_action!(
   problem;
   region,
-  prev_region=nothing,
   extracter_kwargs=(;),
   subspace_kwargs=(;),
   updater_kwargs=(;),
@@ -70,7 +70,7 @@ function region_iterator_action!(
 )
   local_tensor = extracter!(problem, region; extracter_kwargs..., kwargs...)
   local_tensor = prepare_subspace!(
-    problem, local_tensor, region; prev_region, subspace_kwargs..., sweep, kwargs...
+    problem, local_tensor, region; subspace_kwargs..., sweep, kwargs...
   )
   local_tensor = updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
   inserter!(problem, local_tensor, region; sweep, inserter_kwargs..., kwargs...)
