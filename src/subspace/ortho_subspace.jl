@@ -64,14 +64,10 @@ function subspace_expand!(
   Ux = linear_map(Ux)
   ux = commonind(Ux, S)
   Ax, sa = directsum(A => a, Ux => ux)
-
   expander = dag(Ax) * A
   psi[prev_vertex] = Ax
   psi[next_vertex] = expander * C
-
-  # TODO: avoid computing local tensor twice
-  #       while also handling AbstractEdge region case
-  local_tensor = prod(psi[v] for v in region)
+  local_tensor = expander*local_tensor
 
   return local_tensor
 end
