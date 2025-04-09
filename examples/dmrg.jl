@@ -66,7 +66,9 @@ function tree_dmrg(; conserve_qns=false)
   outputlevel = 2
   inserter_kwargs = (; cutoff, maxdim)
   subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
-  energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel)
+  energy, gs_psi = ns.dmrg(
+    H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel
+  )
   return println("Final energy = ", energy)
 end
 
