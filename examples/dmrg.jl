@@ -21,16 +21,19 @@ function dmrg(; N=10, nsites=2, site_type="S=1", conserve_qns=false)
   for v in vertices(H)
     state[v] = iseven(v) ? "Up" : "Dn"
   end
-  psi = itn.ttn(state,s)
+  psi = itn.ttn(state, s)
 
   nsweeps = 8
-  cutoff = 1E-10
-  maxdim = [10, 40, 80, 120]
-  outputlevel = 2
+  cutoff = 1E-9
+  maxdim = [10, 40, 80, 160]
+  outputlevel = 1
   inserter_kwargs = (; cutoff, maxdim)
-  subspace_kwargs = (; cutoff, maxdim, expansion_factor=2.0)
+  subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
+
   @time begin
-    energy, gs_psi = ns.dmrg(H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel)
+    energy, gs_psi = ns.dmrg(
+      H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel
+    )
   end
   println("Final energy = ", energy)
 
