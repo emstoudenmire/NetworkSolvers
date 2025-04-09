@@ -13,22 +13,26 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 ## To Do List
 
 - DMRG improvements
-    - [ ] QN subspace expansion (check Andrea's fork of SketchedLinearAlgebra)
+    - [X] QN subspace expansion
     - [X] Subspace expansion support
     - [X] Maxdim etc. as a vector support
-
-- Subspace expansion improvements:
-    - [ ] QN subspace support
-    - [ ] Subspace kwargs tuple
-    - [ ] Better or more automatic handling of expansion size
 
 - [ ] Add a kind of "checkdone" callback feature. Do we just do it 
     for each algorithm?
 
-- [ ] Keyword arg handling
-    - try to "tunnel" as much as possible from user side straight through
-      to low levels like inserter, then no complexity can arise in between
-    - maybe make "arg packer" functions or @kwdef structs? similar to solvers code
+- [ ] TDVP improvements
+
+  - [X] Redesign TDVP around an array of time steps
+
+  - [ ] Change "time" nomenclature to "exponents"? 
+    Time can be misleading since there is no "im" included.
+
+  - [ ] Or put in "im" when calling through `tdvp`, but
+        not when calling through `exponentiate` (is `integrate` a better name?)
+
+  - [ ] Timers through callbacks. How?
+        "Timed callback" adapter. Wraps callback in something like `time = @elapsed f()` 
+        and grab time through a closure?
 
 - [ ] SweepIterator design questions
 
@@ -51,28 +55,14 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
         I.e. one that lets one detect when each cycle is completed?
         Can we just tell people to use `cycle` if they want this behavior?
 
-- [ ] How to allow `sweep_callback` to update problem
-      e.g. to update `current_time` field in TDVPProblem.
-      (Have callbacks return problem.)
-
-- [ ] Best way to allow user-defined callbacks? (Alternative to Observer.)
-
-- [ ] TDVP improvements
-
-  - [X] Redesign TDVP around an array of time steps
-
-  - [ ] Change "time" nomenclature to "exponents"? 
-    Time can be misleading since there is no "im" included.
-
-  - [ ] Or put in "im" when calling through `tdvp`, but
-        not when calling through `exponentiate` (is `integrate` a better name?)
-
-  - [ ] Timers through callbacks. How?
-        "Timed callback" adapter. Wraps callback in something like `time = @elapsed f()` 
-        and grab time through a closure?
 
 - [ ] Demonstrate iterator adapters, such as "take(iter, n)" that takes
       n steps at each iteration.
+
+- Subspace expansion improvements:
+    - [X] QN subspace support
+    - [X] Subspace kwargs tuple
+    - [X] Better or more automatic handling of expansion size
 
 ## Review of Julia iteration interface
 

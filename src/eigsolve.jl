@@ -31,6 +31,7 @@ function eigsolve(
   extracter_kwargs=(;),
   updater_kwargs=(;),
   inserter_kwargs=(;),
+  subspace_kwargs=(;),
   kws...,
 )
   init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
@@ -42,6 +43,7 @@ function eigsolve(
     extracter_kwargs,
     updater_kwargs,
     inserter_kwargs,
+    subspace_kwargs,
   )
   prob = alternating_update(sweep_iter; outputlevel, kws...)
   return eigenvalue(prob), state(prob)
