@@ -1,4 +1,3 @@
-using ITensors: pause
 import ITensorNetworks as itn
 
 function subspace_expand!(
@@ -9,7 +8,7 @@ function subspace_expand!(
   cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
-  north_pass=2,
+  north_pass=1,
   expansion_factor=1.5,
   kws...,
 )
@@ -28,19 +27,20 @@ function subspace_expand!(
 
   a = commonind(A, C)
   isnothing(a) && return local_tensor
-
   basis_size = prod(dim.(uniqueinds(A, C)))
   expand_maxdim = min(maxdim, ceil(Int, (expansion_factor-1) * dim(a)))
   expand_maxdim = min(basis_size-dim(a), expand_maxdim)
   expand_maxdim <= 0 && return local_tensor
 
-  env = itn.environments(operator(problem))
-  incident_edges = itn.incident_edges(operator(problem))
-  prev_env_edges = filter(e->(src(e) ∉ region && dst(e) ∉ region), incident_edges)
-  E = isempty(prev_env_edges) ? ITensor(1.0) : env[only(prev_env_edges)]
-
+  envs = itn.environments(operator(problem))
   H = itn.operator(operator(problem))
-  sqrt_rho = E*A*H[prev_vertex]
+  sqrt_rho = A
+  for e in itn.incident_edges(operator(problem))
+    (src(e) ∈ region || dst(e) ∈ region) && continue
+    sqrt_rho *= envs[e]
+  end
+  sqrt_rho *= H[prev_vertex]
+
   conj_proj_A(T) = (T - prime(A)*(dag(prime(A))*T))
   for pass in 1:north_pass
     sqrt_rho = conj_proj_A(sqrt_rho)
@@ -48,25 +48,20 @@ function subspace_expand!(
   rho = sqrt_rho * dag(noprime(sqrt_rho))
   D, U = eigen(rho; cutoff, maxdim=expand_maxdim, mindim, ishermitian=true)
 
-  ###TODO: do we need this?
   Uproj(T) = (T - prime(A, a)*(dag(prime(A, a))*T))
-  U = Uproj(U)
-  ###
-
+  for pass in 1:north_pass
+    U = Uproj(U)
+  end
   if norm(dag(U)*A) > 1E-10
     @printf("Warning: |U*A| = %.3E in subspace expansion\n", norm(dag(U)*A))
     return local_tensor
   end
 
   Ax, ax = directsum(A=>a, U=>commonind(U, D))
-
   expander = dag(Ax) * A
   psi[prev_vertex] = Ax
   psi[next_vertex] = expander * C
-
-  # TODO: avoid computing local tensor twice
-  #       while also handling AbstractEdge region case
-  local_tensor = prod(psi[v] for v in region)
+  local_tensor = expander*local_tensor
 
   return local_tensor
 end
