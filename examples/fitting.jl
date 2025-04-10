@@ -34,14 +34,14 @@ function main()
     # #One-site apply (no normalization)
     a = random_tensornetwork(rng, elt, s; link_space=2)
     H = ITensorNetwork(ttn(heisenberg(g), s))
-    Ha = apply(H, a; maxdim=4, nsites=1, inserter_kwargs=(; normalize=false))
+    Ha = apply(H, a; maxdim=4, nsites=1, normalize=false)
     @assert abs(inner(Ha, a; alg="exact") / inner(a, H, a; alg="exact") - 1.0) <=
       10*eps(real(elt))
 
     # #Two-site apply (no normalization)
     a = random_tensornetwork(rng, elt, s; link_space=2)
     H = ITensorNetwork(ttn(heisenberg(g), s))
-    Ha = apply(H, a; maxdim=4, cutoff=1e-16, nsites=2, inserter_kwargs=(; normalize=false))
+    Ha = apply(H, a; maxdim=4, cutoff=1e-16, nsites=2, normalize=false)
     @assert abs(inner(Ha, a; alg="exact") / inner(a, H, a; alg="exact") - 1.0) <=
       10*eps(real(elt))
   end
