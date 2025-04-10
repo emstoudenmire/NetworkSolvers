@@ -4,29 +4,23 @@ import NamedGraphs.PartitionedGraphs as npg
 using NamedGraphs: NamedEdge
 using Printf
 
-using ITensorNetworks: ITensorNetwork, induced_subgraph, ket_vertices, rename_vertices, inv_vertex_map
-
+using ITensorNetworks:
+  ITensorNetwork, induced_subgraph, ket_vertices, rename_vertices, inv_vertex_map
 
 @kwdef mutable struct FittingProblem{State,OverlapNetwork}
   state::State
   overlapnetwork::OverlapNetwork
   overlap::Number = 0
+  gauge_region
 end
 
 overlap(F::FittingProblem) = F.overlap
 overlapnetwork(F::FittingProblem) = F.overlapnetwork
 state(F::FittingProblem) = F.state
+gauge_region(F::FittingProblem) = F.gauge_region
 
-function set(
-  F::FittingProblem;
-  state=state(F),
-  overlapnetwork=overlapnetwork(F),
-  overlap=overlap(F),
-)
-  return FittingProblem(; state, overlapnetwork, overlap)
-end
-
-function extracter!(problem::FittingProblem, prev_region, region; kws...)
+function extracter!(problem::FittingProblem, region; kws...)
+  prev_region = gauge_region(problem)
   tn = state(problem)
   path = itn.edge_sequence_between_regions(tn, prev_region, region)
   tn = itn.gauge_walk(itn.Algorithm("orthogonalize"), tn, path)
@@ -41,6 +35,7 @@ function extracter!(problem::FittingProblem, prev_region, region; kws...)
 
   problem.state = tn
   problem.overlapnetwork = o_tn
+  problem.gauge_region = region
 
   local_tensor = itn.environment(o_tn, region)
   sequence = itn.contraction_sequence(local_tensor; alg="optimal")
@@ -49,39 +44,50 @@ function extracter!(problem::FittingProblem, prev_region, region; kws...)
   return local_tensor
 end
 
-function fitting_inserter!(problem::FittingProblem, local_tensor, region; kws...)
-  inserter!(problem, local_tensor, region; kws...)
-  on = overlapnetwork(problem)
-  tn = state(problem)
-  on = itn.update_factors(
-    on, Dict(zip(region, [dag(tn[v]) for v in region]))
-  )
-  problem.overlapnetwork = on
-  return nothing
+function prepare_subspace!(problem::FittingProblem, local_tensor, region; sweep, kws...)
+  local_tensor = subspace_expand!(problem, local_tensor, region; sweep, kws...)
+  return local_tensor
 end
 
-function region_iterator_action!(
-  problem::FittingProblem;
-  region,
-  prev_region=nothing,
-  extracter_kwargs=(;),
-  updater_kwargs=(;),
-  inserter_kwargs=(;),
+function inserter!(
+  problem::FittingProblem,
+  local_tensor,
+  region;
+  cutoff=default_cutoff(),
+  maxdim=default_maxdim(),
+  mindim=default_mindim(),
+  normalize=true,
   sweep,
-  kwargs...,
+  kws...,
 )
-  prev_region = isnothing(prev_region) ? collect(vertices(state(problem))) : prev_region
-  local_tensor = extracter!(problem, prev_region, region; extracter_kwargs..., kwargs...)
-  updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
-  fitting_inserter!(
-    problem,
-    local_tensor,
-    region;
-    set_orthogonal_region=false,
-    sweep,
-    inserter_kwargs...,
-    kwargs...,
-  )
+  cutoff = get_or_last(cutoff, sweep)
+  mindim = get_or_last(mindim, sweep)
+  maxdim = get_or_last(maxdim, sweep)
+
+  psi = state(problem)
+  v = last(region)
+  if length(region) == 2
+    e = ng.edgetype(psi)(first(region), last(region))
+    indsTe = it.inds(psi[first(region)])
+    tags = it.tags(psi, e)
+    U, C, _ = it.factorize(local_tensor, indsTe; tags, maxdim, mindim, cutoff)
+    psi[first(region)] = U
+  elseif length(region) == 1
+    C = local_tensor
+  else
+    error("Only length==2 or length==1 regions currently supported")
+  end
+  psi[v] = C
+  normalize && (psi[v] /= norm(psi[v]))
+  problem.state = psi
+  #TODO: Why does this break?
+  #problem.gauge_region = [v]
+
+  on = overlapnetwork(problem)
+  tn = state(problem)
+  on = itn.update_factors(on, Dict(zip(region, [dag(tn[v]) for v in region])))
+  problem.overlapnetwork = on
+
   return nothing
 end
 
@@ -107,7 +113,9 @@ function fit_tensornetwork(
 )
   overlap_bpc = itn.BeliefPropagationCache(overlap_network, args...)
   ket_tn = first(induced_subgraph(overlap_network, ket_vertices(overlap_network)))
-  init_prob = FittingProblem(; state=ket_tn, overlapnetwork=overlap_bpc)
+  init_prob = FittingProblem(;
+    state=ket_tn, overlapnetwork=overlap_bpc, gauge_region=collect(vertices(ket_tn))
+  )
 
   common_sweep_kwargs = (; nsites, outputlevel, updater_kwargs, inserter_kwargs)
   kwargs_array = [(; common_sweep_kwargs..., sweep=s) for s in 1:nsweeps]
