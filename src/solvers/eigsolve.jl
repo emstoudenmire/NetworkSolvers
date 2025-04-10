@@ -6,7 +6,7 @@ function eigsolve_solver(
   which_eigval=:SR,
   ishermitian=true,
   tol=1e-10,
-  krylovdim=40,
+  krylovdim=3,
   maxiter=2,
   verbosity=0,
   eager=false,
