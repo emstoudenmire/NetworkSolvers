@@ -41,8 +41,6 @@ function Base.iterate(R::RegionIterator, which=1)
   region_iterator_action!(
     problem(R);
     region=current_region,
-    region_plan=R.region_plan,
-    which_region=R.which_region,
     region_kwargs...,
   )
   return R, next
