@@ -4,7 +4,7 @@ using NDTensors.BackendSelection: Backend, @Backend_str
 subspace_expand!(backend, problem, local_tensor, region; kws...) = local_tensor
 
 function subspace_expand!(
-  problem::EigsolveProblem,
+  problem,
   local_tensor,
   region;
   cutoff=default_cutoff(),
@@ -13,7 +13,7 @@ function subspace_expand!(
   algorithm=nothing,
   sweep,
   kws...,
-)
+  )
   cutoff = get_or_last(cutoff, sweep)
   mindim = get_or_last(mindim, sweep)
   maxdim = get_or_last(maxdim, sweep)
