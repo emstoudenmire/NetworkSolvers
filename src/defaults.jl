@@ -26,8 +26,6 @@ function extracter!(problem, region; kws...)
   return local_tensor
 end
 
-subspace_expand!(problem, local_tensor, region; kws...) = local_tensor
-
 function prepare_subspace!(
   problem, local_tensor, region; prev_region=nothing, sweep, kws...
 )
