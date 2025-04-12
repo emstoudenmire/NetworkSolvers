@@ -12,6 +12,18 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
+- [ ] TDVP improvements
+  - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
+  - [ ] Implement 2-site region plan (maybe as separate function for now)
+  - [ ] Change "time" nomenclature to "exponents"? 
+        Time can be misleading since there is no "im" included.
+        Or put in "im" when calling through `tdvp`, but
+        not when calling through `exponentiate` (is `integrate` a better name?)
+  - [ ] Timers through callbacks. How?
+        "Timed callback" adapter. Wraps callback in something like `time = @elapsed f()` 
+        and grab time through a closure?
+  - [X] Redesign TDVP around an array of time steps
+
 - DMRG improvements
     - [X] QN subspace expansion
     - [X] Subspace expansion support
@@ -20,19 +32,12 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 - [ ] Add a kind of "checkdone" callback feature. Do we just do it 
     for each algorithm?
 
-- [ ] TDVP improvements
-
-  - [X] Redesign TDVP around an array of time steps
-
-  - [ ] Change "time" nomenclature to "exponents"? 
-    Time can be misleading since there is no "im" included.
-
-  - [ ] Or put in "im" when calling through `tdvp`, but
-        not when calling through `exponentiate` (is `integrate` a better name?)
-
-  - [ ] Timers through callbacks. How?
-        "Timed callback" adapter. Wraps callback in something like `time = @elapsed f()` 
-        and grab time through a closure?
+- Keyword argument handling:
+  - [ ] How best to "route" orthogonal sets of keyword arguments without
+        listing them all?
+        Like arguments to alternating_update versus region keyword args:
+        does each algorithm need to list all valid arguments? Or just one
+        set and assume the other is in the kws... pack? 
 
 - [ ] SweepIterator design questions
 
