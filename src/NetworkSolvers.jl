@@ -8,6 +8,7 @@ include("sketched_linear_algebra/range_finder.jl")
 
 include("eigsolve.jl")
 include("tdvp.jl")
+include("fitting.jl")
 
 include("iterators.jl")
 include("adapters.jl")

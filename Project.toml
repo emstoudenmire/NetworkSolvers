@@ -15,8 +15,8 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [compat]
 Graphs = "1.12.0"
-ITensorNetworks = "0.13.1"
-ITensors = "0.8.0"
+ITensorNetworks = "0.13.3"
+ITensors = "0.9"
 IterTools = "1.10.0"
 KrylovKit = "0.6, 0.7, 0.8"
 NamedGraphs = "0.6.4"

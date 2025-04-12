@@ -46,6 +46,7 @@ function inserter!(
   maxdim=default_maxdim(),
   mindim=default_mindim(),
   normalize=false,
+  set_orthogonal_region=true,
   sweep,
   kws...,
 )
@@ -67,7 +68,7 @@ function inserter!(
     error("Only length==2 or length==1 regions currently supported")
   end
   psi[v] = C
-  psi = itn.set_ortho_region(psi, [v])
+  psi = set_orthogonal_region ? itn.set_ortho_region(psi, [v]) : psi
   normalize && (psi[v] /= norm(psi[v]))
   problem.state = psi
   return nothing
