@@ -4,9 +4,6 @@ import NamedGraphs.PartitionedGraphs as npg
 using NamedGraphs: NamedEdge
 using Printf
 
-using ITensorNetworks:
-  ITensorNetwork, induced_subgraph, ket_vertices, rename_vertices, inv_vertex_map
-
 @kwdef mutable struct FittingProblem{State,OverlapNetwork}
   state::State
   overlapnetwork::OverlapNetwork
@@ -21,9 +18,10 @@ gauge_region(F::FittingProblem) = F.gauge_region
 
 function extracter!(problem::FittingProblem, region; kws...)
   prev_region = gauge_region(problem)
-  o_tn = overlapnetwork(problem)
   tn = state(problem)
-  o_tn = itn.update_factors(o_tn, Dict(zip(region, [tn[v] for v in prev_region])))
+  o_tn = itn.update_factors(
+    overlapnetwork(problem), Dict(zip(region, [tn[v] for v in prev_region]))
+  )
   path = itn.edge_sequence_between_regions(tn, prev_region, region)
   tn = itn.gauge_walk(itn.Algorithm("orthogonalize"), tn, path)
   verts = unique(vcat(src.(path), dst.(path)))
@@ -72,7 +70,7 @@ function fit_tensornetwork(
   kws...,
 )
   overlap_bpc = itn.BeliefPropagationCache(overlap_network, args...)
-  ket_tn = first(induced_subgraph(overlap_network, ket_vertices(overlap_network)))
+  ket_tn = first(itn.induced_subgraph(overlap_network, itn.ket_vertices(overlap_network)))
   init_prob = FittingProblem(;
     state=ket_tn, overlapnetwork=overlap_bpc, gauge_region=collect(vertices(ket_tn))
   )
@@ -82,7 +80,7 @@ function fit_tensornetwork(
   kwargs_array = [(; common_sweep_kwargs..., sweep=s) for s in 1:nsweeps]
   sweep_iter = sweep_iterator(init_prob, kwargs_array)
   converged_prob = alternating_update(sweep_iter; outputlevel, kws...)
-  return rename_vertices(inv_vertex_map(overlap_network), state(converged_prob))
+  return itn.rename_vertices(itn.inv_vertex_map(overlap_network), state(converged_prob))
 end
 
 function fit_tensornetwork(tn, init_state, args...; kwargs...)
@@ -98,7 +96,7 @@ function itn.truncate(tn; maxdim::Int64, cutoff=0.0, kwargs...)
 end
 
 function itn.apply(
-  A::ITensorNetwork, x::ITensorNetwork; maxdim::Int64, cutoff=0.0, kwargs...
+  A::itn.ITensorNetwork, x::itn.ITensorNetwork; maxdim::Int64, cutoff=0.0, kwargs...
 )
   init_state = itn.ITensorNetwork(
     v -> inds -> it.delta(inds), itn.siteinds(x); link_space=maxdim
