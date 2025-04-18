@@ -22,6 +22,17 @@ function updater!(
   return local_tensor
 end
 
+function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
+  if outputlevel >= 1
+    psi = state(problem)
+    print("After sweep $sweep/$nsweeps: ")
+    @printf("eigenvalue=%.12f ", eigenvalue(problem))
+    @printf("maxlinkdim=%d", itn.maxlinkdim(psi))
+    println()
+    flush(stdout)
+  end
+end
+
 function eigsolve(
   H,
   init_state;
@@ -32,6 +43,7 @@ function eigsolve(
   updater_kwargs=(;),
   inserter_kwargs=(;),
   subspace_kwargs=(;),
+  sweep_printer=eigsolve_sweep_printer,
   kws...,
 )
   init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
@@ -45,7 +57,7 @@ function eigsolve(
     inserter_kwargs,
     subspace_kwargs,
   )
-  prob = alternating_update(sweep_iter; outputlevel, kws...)
+  prob = alternating_update(sweep_iter; outputlevel, sweep_printer, kws...)
   return eigenvalue(prob), state(prob)
 end
 
