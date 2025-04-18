@@ -13,7 +13,7 @@ function subspace_expand!(
   algorithm=nothing,
   sweep,
   kws...,
-  )
+)
   cutoff = get_or_last(cutoff, sweep)
   mindim = get_or_last(mindim, sweep)
   maxdim = get_or_last(maxdim, sweep)

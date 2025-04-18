@@ -38,11 +38,7 @@ function Base.iterate(R::RegionIterator, which=1)
   isnothing(region_plan_state) && return nothing
   (current_region, region_kwargs), next = region_plan_state
 
-  region_iterator_action!(
-    problem(R);
-    region=current_region,
-    region_kwargs...,
-  )
+  region_iterator_action!(problem(R); region=current_region, region_kwargs...)
   return R, next
 end
 

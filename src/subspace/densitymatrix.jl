@@ -28,7 +28,7 @@ function subspace_expand!(
   a = commonind(A, C)
   isnothing(a) && return local_tensor
   basis_size = prod(dim.(uniqueinds(A, C)))
-  expand_maxdim = min(maxdim, ceil(Int, (expansion_factor-1) * dim(a)))
+  expand_maxdim = min(maxdim, ceil(Int, expansion_factor * dim(a)))
   expand_maxdim = min(basis_size-dim(a), expand_maxdim)
   expand_maxdim <= 0 && return local_tensor
 
@@ -58,6 +58,10 @@ function subspace_expand!(
   end
 
   Ax, ax = directsum(A=>a, U=>commonind(U, D))
+  #println("Performing densitymatrix subspace expansion")
+  #println("Old space: ", space(a))
+  #println("New space: ", space(ax))
+  #ITensors.pause()
   expander = dag(Ax) * A
   psi[prev_vertex] = Ax
   psi[next_vertex] = expander * C

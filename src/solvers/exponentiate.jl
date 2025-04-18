@@ -11,7 +11,7 @@ function exponentiate_solver(
   ishermitian=true,
   issymmetric=true,
   eager=true,
-  kws...
+  kws...,
 )
   result, exp_info = KrylovKit.exponentiate(
     operator,
