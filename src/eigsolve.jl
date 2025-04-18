@@ -26,7 +26,7 @@ function eigsolve(
   H,
   init_state;
   nsweeps,
-  nsites=2,
+  nsites=1,
   outputlevel=0,
   extracter_kwargs=(;),
   updater_kwargs=(;),
