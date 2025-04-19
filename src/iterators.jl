@@ -64,7 +64,13 @@ function region_iterator_action!(
 )
   local_tensor = extracter!(problem, region; extracter_kwargs..., kwargs...)
   local_tensor = prepare_subspace!(
-    problem, local_tensor, region; subspace_kwargs..., sweep, kwargs...
+    problem,
+    local_tensor,
+    region;
+    subspace_kwargs...,
+    truncation_kwargs...,
+    sweep,
+    kwargs...,
   )
   local_tensor = updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
   inserter!(problem, local_tensor, region; sweep, truncation_kwargs..., kwargs...)

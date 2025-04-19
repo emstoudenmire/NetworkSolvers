@@ -9,7 +9,8 @@ function subspace_expand!(
   maxdim=default_maxdim(),
   mindim=default_mindim(),
   north_pass=1,
-  expansion_factor=1.5,
+  expansion_factor=default_expansion_factor(),
+  max_expand=default_max_expand(),
   kws...,
 )
   isa(region, AbstractEdge) && return local_tensor
@@ -28,8 +29,10 @@ function subspace_expand!(
   a = commonind(A, C)
   isnothing(a) && return local_tensor
   basis_size = prod(dim.(uniqueinds(A, C)))
-  expand_maxdim = min(maxdim, ceil(Int, expansion_factor * dim(a)))
-  expand_maxdim = min(basis_size-dim(a), expand_maxdim)
+
+  expand_maxdim = compute_expansion(
+    dim(a), basis_size; expansion_factor, max_expand, maxdim
+  )
   expand_maxdim <= 0 && return local_tensor
 
   envs = itn.environments(operator(problem))

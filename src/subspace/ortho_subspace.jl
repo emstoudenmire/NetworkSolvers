@@ -24,7 +24,8 @@ function subspace_expand!(
   cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
-  expansion_factor=1.2,
+  expansion_factor=default_expansion_factor(),
+  max_expand=default_max_expand(),
   kws...,
 )
   if isnothing(prev_region) || isa(region, AbstractEdge)
@@ -48,6 +49,7 @@ function subspace_expand!(
   a = commonind(A, C)
   isnothing(a) && return local_tensor
   basis_inds = uniqueinds(A, C)
+  basis_size = prod(dim.(basis_inds))
 
   ci = combinedind(combiner(basis_inds...))
   ax_space = expand_space(space(ci), expansion_factor)
@@ -55,11 +57,11 @@ function subspace_expand!(
 
   linear_map(w) = (w - A * (dag(A) * w))
   Y = linear_map(random_itensor(basis_inds, dag(ax)))
-  maxdim_goal = ceil(Int, expansion_factor * dim(a))
-  maxdim_goal = min(maxdim_goal, maxdim)
-  Ux_maxdim = maxdim_goal - dim(a)
-  (norm(Y) <= 1E-15 || Ux_maxdim <= 0) && return local_tensor
-  Ux, S, V = svd(Y, basis_inds; cutoff=1E-14, maxdim=Ux_maxdim, lefttags="ux,Link")
+  expand_maxdim = compute_expansion(
+    dim(a), basis_size; expansion_factor, max_expand, maxdim
+  )
+  (norm(Y) <= 1E-15 || expand_maxdim <= 0) && return local_tensor
+  Ux, S, V = svd(Y, basis_inds; cutoff=1E-14, maxdim=expand_maxdim, lefttags="ux,Link")
 
   Ux = linear_map(Ux)
   ux = commonind(Ux, S)
