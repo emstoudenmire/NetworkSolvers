@@ -6,6 +6,7 @@ include("solvers/runge_kutta.jl")
 
 include("sketched_linear_algebra/range_finder.jl")
 
+include("permute_indices.jl")
 include("eigsolve.jl")
 include("tdvp.jl")
 include("fitting.jl")

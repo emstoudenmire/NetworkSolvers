@@ -45,6 +45,8 @@ function applyexp(
   subspace_kwargs=(;),
   kws...,
 )
+  H = permute_indices(H)
+  init_state = permute_indices(init_state)
   init_prob = TDVPProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
   time_steps = diff([0.0, time_points...])[2:end]
   sweep_kws = (;
