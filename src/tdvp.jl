@@ -39,7 +39,7 @@ function applyexp(
   time_points;
   extracter_kwargs=(;),
   updater_kwargs=(;),
-  inserter_kwargs=(;),
+  truncation_kwargs=(;),
   outputlevel=0,
   nsites=1,
   subspace_kwargs=(;),
@@ -48,7 +48,12 @@ function applyexp(
   init_prob = TDVPProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
   time_steps = diff([0.0, time_points...])[2:end]
   sweep_kws = (;
-    outputlevel, extracter_kwargs, inserter_kwargs, nsites, subspace_kwargs, updater_kwargs
+    outputlevel,
+    extracter_kwargs,
+    truncation_kwargs,
+    nsites,
+    subspace_kwargs,
+    updater_kwargs,
   )
   kws_array = [(; sweep_kws..., time_step=t) for t in time_steps]
   sweep_iter = sweep_iterator(init_prob, kws_array)

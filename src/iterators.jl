@@ -58,7 +58,7 @@ function region_iterator_action!(
   extracter_kwargs=(;),
   subspace_kwargs=(;),
   updater_kwargs=(;),
-  inserter_kwargs=(;),
+  truncation_kwargs=(;),
   sweep,
   kwargs...,
 )
@@ -67,7 +67,7 @@ function region_iterator_action!(
     problem, local_tensor, region; subspace_kwargs..., sweep, kwargs...
   )
   local_tensor = updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
-  inserter!(problem, local_tensor, region; sweep, inserter_kwargs..., kwargs...)
+  inserter!(problem, local_tensor, region; sweep, truncation_kwargs..., kwargs...)
   return nothing
 end
 

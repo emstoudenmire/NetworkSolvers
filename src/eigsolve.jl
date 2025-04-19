@@ -41,7 +41,7 @@ function eigsolve(
   outputlevel=0,
   extracter_kwargs=(;),
   updater_kwargs=(;),
-  inserter_kwargs=(;),
+  truncation_kwargs=(;),
   subspace_kwargs=(;),
   sweep_printer=eigsolve_sweep_printer,
   kws...,
@@ -54,7 +54,7 @@ function eigsolve(
     outputlevel,
     extracter_kwargs,
     updater_kwargs,
-    inserter_kwargs,
+    truncation_kwargs,
     subspace_kwargs,
   )
   prob = alternating_update(sweep_iter; outputlevel, sweep_printer, kws...)

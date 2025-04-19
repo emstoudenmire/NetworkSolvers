@@ -33,6 +33,11 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
     for each algorithm?
 
 - Keyword argument handling:
+  - [X] How to "mix" keyword argument packs?
+        Example: subspace expansion taking `inserter_kwargs`. It works
+        but then it causes a dependency between the subspace system and
+        inserter system.
+        Maybe more "conceptual" kwarg packs, like `truncation_kwargs` ?
   - [ ] How best to "route" orthogonal sets of keyword arguments without
         listing them all?
         Like arguments to alternating_update versus region keyword args:

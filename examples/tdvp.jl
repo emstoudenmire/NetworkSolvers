@@ -20,14 +20,14 @@ function main(; N=10, total_time=-1.0, time_step=-0.1)
   psi0 = itn.random_mps(s; link_space=16)
 
   outputlevel = 0
-  inserter_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
+  truncation_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
   time_range = 0.0:time_step:total_time
-  res = ns.applyexp(H, psi0, time_range; inserter_kwargs, outputlevel)
+  res = ns.applyexp(H, psi0, time_range; truncation_kwargs, outputlevel)
 
   # Using RK solver
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
   res_rk4 = ns.applyexp(
-    H, psi0, 0.0:time_step:total_time; inserter_kwargs, updater_kwargs, outputlevel
+    H, psi0, 0.0:time_step:total_time; truncation_kwargs, updater_kwargs, outputlevel
   )
 
   @show inner(res, res_rk4)
@@ -56,12 +56,19 @@ function test_tdvp(; N=6, total_time=-0.1, time_step=-0.01)
   end
 
   outputlevel = 0
-  inserter_kwargs = (; maxdim=100, cutoff=1E-10)
+  truncation_kwargs = (; maxdim=100, cutoff=1E-10)
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=2)
   subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
   #subspace_kwargs = (;)
   res = ns.applyexp(
-    H, psi, time_range; inserter_kwargs, outputlevel, region_callback, subspace_kwargs, updater_kwargs
+    H,
+    psi,
+    time_range;
+    truncation_kwargs,
+    outputlevel,
+    region_callback,
+    subspace_kwargs,
+    updater_kwargs,
   )
   #@show norm(res)
 
@@ -91,16 +98,16 @@ function test_tdvp(; N=6, total_time=-0.1, time_step=-0.01)
 
   maxerr = 0.0
   err_point = nothing
-  for i=1:size(szs,1),j=1:size(szs,2)
-    err = norm(szs[i,j]-szs_ed[i,j])
+  for i in 1:size(szs, 1), j in 1:size(szs, 2)
+    err = norm(szs[i, j]-szs_ed[i, j])
     if err > maxerr
       maxerr = err
-      err_point = (i,j)
+      err_point = (i, j)
     end
   end
-  @printf("Largest error (%.3E) at i,j=%d,%d\n",maxerr,err_point[1],err_point[2])
-  @printf("   TDVP value = %.10f\n",szs[err_point...])
-  @printf("     ED value = %.10f\n",szs_ed[err_point...])
+  @printf("Largest error (%.3E) at i,j=%d,%d\n", maxerr, err_point[1], err_point[2])
+  @printf("   TDVP value = %.10f\n", szs[err_point...])
+  @printf("     ED value = %.10f\n", szs_ed[err_point...])
 
   return nothing
 end

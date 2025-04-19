@@ -65,7 +65,7 @@ function fit_tensornetwork(
   outputlevel=0,
   extracter_kwargs=(;),
   updater_kwargs=(;),
-  inserter_kwargs=(;),
+  truncation_kwargs=(;),
   normalize=true,
   kws...,
 )
@@ -75,8 +75,8 @@ function fit_tensornetwork(
     state=ket_tn, overlapnetwork=overlap_bpc, gauge_region=collect(vertices(ket_tn))
   )
 
-  inserter_kwargs = (; inserter_kwargs..., normalize, set_orthogonal_region=false)
-  common_sweep_kwargs = (; nsites, outputlevel, updater_kwargs, inserter_kwargs)
+  truncation_kwargs = (; truncation_kwargs..., normalize, set_orthogonal_region=false)
+  common_sweep_kwargs = (; nsites, outputlevel, updater_kwargs, truncation_kwargs)
   kwargs_array = [(; common_sweep_kwargs..., sweep=s) for s in 1:nsweeps]
   sweep_iter = sweep_iterator(init_prob, kwargs_array)
   converged_prob = alternating_update(sweep_iter; outputlevel, kws...)
@@ -92,7 +92,7 @@ function itn.truncate(tn; maxdim::Int64, cutoff=0.0, kwargs...)
     v -> inds -> it.delta(inds), itn.siteinds(tn); link_space=maxdim
   )
   overlap_network = itn.inner_network(tn, init_state)
-  return fit_tensornetwork(overlap_network; inserter_kwargs=(; cutoff, maxdim), kwargs...)
+  return fit_tensornetwork(overlap_network; truncation_kwargs=(; cutoff, maxdim), kwargs...)
 end
 
 function itn.apply(
@@ -102,5 +102,5 @@ function itn.apply(
     v -> inds -> it.delta(inds), itn.siteinds(x); link_space=maxdim
   )
   overlap_network = itn.inner_network(x, A, init_state)
-  return fit_tensornetwork(overlap_network; inserter_kwargs=(; cutoff, maxdim), kwargs...)
+  return fit_tensornetwork(overlap_network; truncation_kwargs=(; cutoff, maxdim), kwargs...)
 end
