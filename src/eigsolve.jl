@@ -25,7 +25,11 @@ end
 function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
   if outputlevel >= 1
     psi = state(problem)
-    print("After sweep $sweep/$nsweeps: ")
+    if nsweeps >= 10
+      @printf("After sweep %02d/%d ", sweep, nsweeps)
+    else
+      @printf("After sweep %d/%d ", sweep, nsweeps)
+    end
     @printf("eigenvalue=%.12f ", eigenvalue(problem))
     @printf("maxlinkdim=%d", itn.maxlinkdim(psi))
     println()
