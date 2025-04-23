@@ -12,6 +12,12 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
+- One-site redesign goals:
+  - [ ] When ortho center is on a bond, have a new vertex for the bond matrix.
+  - [ ] Check that densitymatrix subspace expansion code works for 1-site TDVP.
+  - [ ] Check behavior of bond dimension for 1-site DMRG. 
+        How does the subspace expansion interact with 1-site SVD truncation?
+
 - [ ] TDVP improvements
   - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
   - [ ] Implement 2-site region plan (maybe as separate function for now)
