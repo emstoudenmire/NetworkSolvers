@@ -17,6 +17,7 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
   - [ ] Check that densitymatrix subspace expansion code works for 1-site TDVP.
   - [ ] Check behavior of bond dimension for 1-site DMRG. 
         How does the subspace expansion interact with 1-site SVD truncation?
+  - [ ] Get rid of special edge overload of inserter?
 
 - [ ] TDVP improvements
   - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.

@@ -4,6 +4,14 @@ using NDTensors.BackendSelection: Backend, @Backend_str
 default_expansion_factor() = 1.5
 default_max_expand() = 4
 
+function prepare_subspace!(
+  problem, local_tensor, region; prev_region=nothing, sweep, kws...
+)
+  local_tensor = subspace_expand!(problem, local_tensor, region; prev_region, sweep, kws...)
+  problem.operator = itn.position(operator(problem), state(problem), region)
+  return local_tensor
+end
+
 subspace_expand!(backend, problem, local_tensor, region; kws...) = local_tensor
 
 function subspace_expand!(
