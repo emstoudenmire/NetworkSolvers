@@ -4,7 +4,7 @@ function subspace_expand!(
   ::Backend"densitymatrix",
   problem::EigsolveProblem,
   local_tensor,
-  region;
+  region_iterator;
   cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
@@ -13,6 +13,7 @@ function subspace_expand!(
   max_expand=default_max_expand(),
   kws...,
 )
+  region = current_region(region_iterator)
   isa(region, AbstractEdge) && return local_tensor
   psi = state(problem)
 

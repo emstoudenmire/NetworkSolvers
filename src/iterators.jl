@@ -29,16 +29,21 @@ end
 
 problem(R::RegionIterator) = R.problem
 current_region_plan(R::RegionIterator) = R.region_plan[R.which_region]
-current_region(R::RegionIterator) = R.region_plan[R.which_region][1]
-region_kwargs(R::RegionIterator) = R.region_plan[R.which_region][2]
+current_region(R::RegionIterator) = current_region_plan(R)[1]
+region_kwargs(R::RegionIterator) = current_region_plan(R)[2]
+function previous_region(R::RegionIterator)
+  R.which_region==1 ? nothing : R.region_plan[R.which_region - 1][1]
+end
+function next_region(R::RegionIterator)
+  R.which_region==length(R.region_plan) ? nothing : R.region_plan[R.which_region + 1][1]
+end
 
 function Base.iterate(R::RegionIterator, which=1)
   R.which_region = which
   region_plan_state = iterate(R.region_plan, which)
   isnothing(region_plan_state) && return nothing
   (current_region, region_kwargs), next = region_plan_state
-
-  region_iterator_action!(problem(R); region=current_region, region_kwargs...)
+  region_iterator_action!(problem(R), R; region_kwargs...)
   return R, next
 end
 
@@ -53,8 +58,8 @@ function region_iterator(problem; nsites=1, sweep_kwargs...)
 end
 
 function region_iterator_action!(
-  problem;
-  region,
+  problem,
+  region_iterator;
   extracter_kwargs=(;),
   subspace_kwargs=(;),
   updater_kwargs=(;),
@@ -62,18 +67,20 @@ function region_iterator_action!(
   sweep,
   kwargs...,
 )
-  local_tensor = extracter!(problem, region; extracter_kwargs..., kwargs...)
+  local_tensor = extracter!(problem, region_iterator; extracter_kwargs..., kwargs...)
   local_tensor = prepare_subspace!(
     problem,
     local_tensor,
-    region;
+    region_iterator;
     subspace_kwargs...,
     truncation_kwargs...,
     sweep,
     kwargs...,
   )
-  local_tensor = updater!(problem, local_tensor, region; updater_kwargs..., kwargs...)
-  inserter!(problem, local_tensor, region; sweep, truncation_kwargs..., kwargs...)
+  local_tensor = updater!(
+    problem, local_tensor, region_iterator; updater_kwargs..., kwargs...
+  )
+  inserter!(problem, local_tensor, region_iterator; sweep, truncation_kwargs..., kwargs...)
   return nothing
 end
 

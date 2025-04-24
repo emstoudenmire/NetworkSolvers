@@ -2,7 +2,7 @@
 function inserter!(
   problem,
   local_tensor,
-  region;
+  region_iterator;
   cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
@@ -15,9 +15,14 @@ function inserter!(
   mindim = get_or_last(mindim, sweep)
   maxdim = get_or_last(maxdim, sweep)
 
+  region = current_region(region_iterator)
   psi = state(problem)
-  v = last(region)
-  if length(region) == 2
+  if region isa ng.NamedEdge
+    psi = state(problem)
+    psi[Graphs.dst(region)] *= local_tensor
+    problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])
+    return nothing
+  elseif length(region) == 2
     e = ng.edgetype(psi)(first(region), last(region))
     indsTe = it.inds(psi[first(region)])
     tags = it.tags(psi, e)
@@ -26,18 +31,12 @@ function inserter!(
   elseif length(region) == 1
     C = local_tensor
   else
-    error("Only length==2 or length==1 regions currently supported")
+    error("Region of length $(length(region)) not currently supported")
   end
+  v = last(region)
   psi[v] = C
   psi = set_orthogonal_region ? itn.set_ortho_region(psi, [v]) : psi
   normalize && (psi[v] /= norm(psi[v]))
   problem.state = psi
-  return nothing
-end
-
-function inserter!(problem, local_tensor, region::ng.NamedEdge; kws...)
-  psi = state(problem)
-  psi[Graphs.dst(region)] *= local_tensor
-  problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])
   return nothing
 end

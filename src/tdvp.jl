@@ -18,7 +18,7 @@ end
 function updater!(
   T::TDVPProblem,
   local_tensor,
-  region;
+  region_iterator;
   time_step,
   dt,
   solver=exponentiate_solver,

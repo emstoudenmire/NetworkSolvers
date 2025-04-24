@@ -1,5 +1,6 @@
 
-function extracter!(problem, region; kws...)
+function extracter!(problem, region_iterator; kws...)
+  region = current_region(region_iterator)
   if isa(region, Graphs.AbstractEdge)
     vsrc, vdst = Graphs.src(region), Graphs.dst(region)
     psi = itn.orthogonalize(state(problem), vsrc)

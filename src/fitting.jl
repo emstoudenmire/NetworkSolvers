@@ -16,7 +16,8 @@ overlapnetwork(F::FittingProblem) = F.overlapnetwork
 state(F::FittingProblem) = F.state
 gauge_region(F::FittingProblem) = F.gauge_region
 
-function extracter!(problem::FittingProblem, region; kws...)
+function extracter!(problem::FittingProblem, region_iterator; kws...)
+  region = current_region(region_iterator)
   prev_region = gauge_region(problem)
   tn = state(problem)
   o_tn = itn.update_factors(

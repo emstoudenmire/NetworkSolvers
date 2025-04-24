@@ -4,20 +4,20 @@ using NDTensors.BackendSelection: Backend, @Backend_str
 default_expansion_factor() = 1.5
 default_max_expand() = 4
 
-function prepare_subspace!(
-  problem, local_tensor, region; prev_region=nothing, sweep, kws...
-)
-  local_tensor = subspace_expand!(problem, local_tensor, region; prev_region, sweep, kws...)
-  problem.operator = itn.position(operator(problem), state(problem), region)
+function prepare_subspace!(problem, local_tensor, region_iterator; sweep, kws...)
+  local_tensor = subspace_expand!(problem, local_tensor, region_iterator; sweep, kws...)
+  problem.operator = itn.position(
+    operator(problem), state(problem), current_region(region_iterator)
+  )
   return local_tensor
 end
 
-subspace_expand!(backend, problem, local_tensor, region; kws...) = local_tensor
+subspace_expand!(backend, problem, local_tensor, region_iterator; kws...) = local_tensor
 
 function subspace_expand!(
   problem,
   local_tensor,
-  region;
+  region_iterator;
   cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
@@ -29,7 +29,14 @@ function subspace_expand!(
   mindim = get_or_last(mindim, sweep)
   maxdim = get_or_last(maxdim, sweep)
   return subspace_expand!(
-    Backend(algorithm), problem, local_tensor, region; cutoff, mindim, maxdim, kws...
+    Backend(algorithm),
+    problem,
+    local_tensor,
+    region_iterator;
+    cutoff,
+    mindim,
+    maxdim,
+    kws...,
   )
 end
 
