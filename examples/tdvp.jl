@@ -6,7 +6,7 @@ using Printf
 using Random
 import NetworkSolvers as ns
 
-function main(; N=10, total_time=-1.0, time_step=-0.1)
+function tdvp(; N=10, total_time=-1.0, time_step=-0.1)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
