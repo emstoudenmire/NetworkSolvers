@@ -23,7 +23,8 @@ include("permute_indices.jl")
 # Iterators, tree traversal, region plans
 include("iterators.jl")
 include("adapters.jl")
-include("region_plans.jl")
+include("region_plans/region_plans.jl")
+include("region_plans/tdvp_region_plans.jl")
 include("alternating_update.jl")
 
 end
