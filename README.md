@@ -10,14 +10,28 @@ https://docs.sciml.ai/DiffEqDocs/stable/basics/integrator/
 Matt's Gist for an early iterators design scheme is here:
 https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
+## Notes on New One-Site Design
+
+A challenge of introducing a new vertex to hold the "bond" tensor is:
+how do we 'detect' that this is what we did in later code?
+In NetworkSolvers, we can keep the old region around.
+
+Ideally we might handle this inside the TreeTensorNetwork or ITensorNetwork
+by having a gauge object and using its state to change the behavior of
+`orthogonalize` or `gauge_walk` etc.
+
 ## To Do List
 
 - One-site redesign goals:
   - [ ] When ortho center is on a bond, have a new vertex for the bond matrix.
+  - [ ] Don't pass region around anymore. Instead have problem (and possibly state
+        inside problem) carry region information like in fitting example.
   - [ ] Check that densitymatrix subspace expansion code works for 1-site TDVP.
   - [ ] Check behavior of bond dimension for 1-site DMRG. 
         How does the subspace expansion interact with 1-site SVD truncation?
   - [ ] Get rid of special edge overload of inserter?
+  - [ ] Try other sweeping patterns, like breadth-first versus depth-first.
+        Does it make subspace more effective for 1-site?
 
 - [ ] TDVP improvements
   - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.

@@ -22,11 +22,11 @@ function main(; N=10, total_time=-1.0, time_step=-0.1)
   outputlevel = 0
   truncation_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
   time_range = 0.0:time_step:total_time
-  res = ns.applyexp(H, psi0, time_range; truncation_kwargs, outputlevel)
+  res = ns.tdvp(H, psi0, time_range; truncation_kwargs, outputlevel)
 
   # Using RK solver
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
-  res_rk4 = ns.applyexp(
+  res_rk4 = ns.tdvp(
     H, psi0, 0.0:time_step:total_time; truncation_kwargs, updater_kwargs, outputlevel
   )
 

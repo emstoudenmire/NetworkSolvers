@@ -1,22 +1,28 @@
 module NetworkSolvers
 
+# Core solvers and linear algebra
 include("solvers/eigsolve.jl")
 include("solvers/exponentiate.jl")
 include("solvers/runge_kutta.jl")
-
 include("sketched_linear_algebra/range_finder.jl")
 
-include("permute_indices.jl")
+# Algorithms and interfaces
 include("eigsolve.jl")
 include("tdvp.jl")
 include("fitting.jl")
 
-include("iterators.jl")
-include("adapters.jl")
+# Tensor network algorithm components
 include("defaults.jl")
+include("extracter.jl")
+include("inserter.jl")
 include("subspace/subspace.jl")
 include("subspace/ortho_subspace.jl")
 include("subspace/densitymatrix.jl")
+include("permute_indices.jl")
+
+# Iterators, tree traversal, region plans
+include("iterators.jl")
+include("adapters.jl")
 include("region_plans.jl")
 include("alternating_update.jl")
 

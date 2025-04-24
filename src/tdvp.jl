@@ -62,3 +62,5 @@ function applyexp(
   converged_prob = alternating_update(sweep_iter; outputlevel, kws...)
   return state(converged_prob)
 end
+
+tdvp(args...; kws...) = applyexp(args...; kws...)
