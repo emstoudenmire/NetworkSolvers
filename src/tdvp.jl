@@ -20,14 +20,13 @@ function updater!(
   local_tensor,
   region_iterator;
   time_step,
-  dt,
   solver=exponentiate_solver,
   outputlevel,
   kws...,
 )
   local_tensor, info = solver(operator(T), time_step, local_tensor; kws...)
-  T.current_time += dt
-  if outputlevel >= 2 && abs(dt) > 0.0
+  if outputlevel >= 2 && is_last_region(region_iterator)
+    T.current_time += 2*time_step  # currently assuming second-order method
     @printf("  Current time = %s\n", current_time(T))
   end
   return local_tensor
