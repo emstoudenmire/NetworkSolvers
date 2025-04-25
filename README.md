@@ -22,6 +22,10 @@ by having a gauge object and using its state to change the behavior of
 
 ## To Do List
 
+- Test improvements:
+  - [ ] Make examples runnable by runtests.jl
+  - [ ] Test quench with 2-site TDVP + subspace
+
 - One-site redesign goals:
   - [ ] When ortho center is on a bond, have a new vertex for the bond matrix.
   - [ ] Don't pass region around anymore. Instead have problem (and possibly state
