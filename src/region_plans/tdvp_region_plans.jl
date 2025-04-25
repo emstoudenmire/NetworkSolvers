@@ -1,6 +1,4 @@
-import Graphs: AbstractGraph, AbstractEdge, edges, dst, src, vertices
-import NamedGraphs.GraphsExtensions:
-  default_root_vertex, post_order_dfs_edges, post_order_dfs_vertices
+import Graphs: AbstractGraph
 
 function tdvp_regions(graph::AbstractGraph, time_step; updater_kwargs, kws...)
   basic_fwd_sweep = basic_forward_sweep(graph; kws...)

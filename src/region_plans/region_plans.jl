@@ -1,4 +1,4 @@
-import Graphs: AbstractGraph, AbstractEdge, edges, dst, src, vertices
+import Graphs: AbstractGraph, dst, src
 import NamedGraphs.GraphsExtensions:
   default_root_vertex, post_order_dfs_edges, post_order_dfs_vertices
 
@@ -17,7 +17,6 @@ end
 
 function basic_region_plan(args...; kws...)
   fwd_sweep = basic_forward_sweep(args...; kws...)
-  # Reverse regions as well as ordering of regions
   rev_sweep = [(reverse(reg_kws[1]), reg_kws[2]) for reg_kws in reverse(fwd_sweep)]
   return [fwd_sweep..., rev_sweep...]
 end
