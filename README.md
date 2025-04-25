@@ -34,8 +34,10 @@ by having a gauge object and using its state to change the behavior of
         Does it make subspace more effective for 1-site?
 
 - [ ] TDVP improvements
-  - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
   - [ ] Implement 2-site region plan (maybe as separate function for now)
+  - [ ] Better way of detecting end of sweep and advancing the time step.
+        Possibly by querying `isnothing(next_region(region_iterator))`.
+  - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
   - [ ] Change "time" nomenclature to "exponents"? 
         Time can be misleading since there is no "im" included.
         Or put in "im" when calling through `tdvp`, but

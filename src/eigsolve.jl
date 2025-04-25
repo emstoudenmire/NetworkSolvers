@@ -1,5 +1,4 @@
 import ITensorNetworks as itn
-import ITensors as it
 using Printf
 
 @kwdef mutable struct EigsolveProblem{State,Operator}

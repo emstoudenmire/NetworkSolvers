@@ -37,6 +37,7 @@ end
 function next_region(R::RegionIterator)
   R.which_region==length(R.region_plan) ? nothing : R.region_plan[R.which_region + 1][1]
 end
+is_last_region(R::RegionIterator) = isnothing(next_region(R))
 
 function Base.iterate(R::RegionIterator, which=1)
   R.which_region = which

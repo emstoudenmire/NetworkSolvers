@@ -6,7 +6,7 @@ using Printf
 using Random
 import NetworkSolvers as ns
 
-function main(; N=10, total_time=-1.0, time_step=-0.1)
+function tdvp(; N=10, total_time=-1.0, time_step=-0.1)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
@@ -20,9 +20,10 @@ function main(; N=10, total_time=-1.0, time_step=-0.1)
   psi0 = itn.random_mps(s; link_space=16)
 
   outputlevel = 0
+  nsites = 1
   truncation_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
   time_range = 0.0:time_step:total_time
-  res = ns.tdvp(H, psi0, time_range; truncation_kwargs, outputlevel)
+  res_1site = ns.tdvp(H, psi0, time_range; nsites, truncation_kwargs, outputlevel)
 
   # Using RK solver
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
@@ -30,7 +31,13 @@ function main(; N=10, total_time=-1.0, time_step=-0.1)
     H, psi0, 0.0:time_step:total_time; truncation_kwargs, updater_kwargs, outputlevel
   )
 
-  @show inner(res, res_rk4)
+  # Using 2-site sweeping scheme
+  nsites = 2
+  res_2site = ns.tdvp(H, psi0, time_range; nsites, truncation_kwargs, outputlevel)
+
+  @show inner(res_1site, res_2site)
+  @show inner(res_1site, res_rk4)
+  @show inner(res_2site, res_rk4)
 
   return nothing
 end

@@ -1,5 +1,6 @@
 import ITensorNetworks as itn
 import ITensors as it
+import Graphs: vertices
 import NamedGraphs.PartitionedGraphs as npg
 using NamedGraphs: NamedEdge
 using Printf

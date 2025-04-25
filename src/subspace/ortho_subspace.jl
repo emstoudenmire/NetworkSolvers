@@ -1,4 +1,5 @@
 using ITensors
+using Graphs: AbstractEdge
 
 expand_space(χ::Integer, expansion_factor) = max(χ + 1, floor(Int, expansion_factor * χ))
 
