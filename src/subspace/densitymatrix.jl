@@ -1,4 +1,5 @@
 import ITensorNetworks as itn
+using Graphs: AbstractEdge
 
 function subspace_expand!(
   ::Backend"densitymatrix",
