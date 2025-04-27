@@ -6,7 +6,7 @@ using Printf
 using Random
 import NetworkSolvers as ns
 
-function tdvp(; N=10, total_time=-1.0, time_step=-0.1)
+function tdvp(; N=10, total_time=1.0, time_step=0.1)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
@@ -42,7 +42,7 @@ function tdvp(; N=10, total_time=-1.0, time_step=-0.1)
   return nothing
 end
 
-function test_tdvp(; N=6, total_time=-0.1, time_step=-0.01)
+function test_tdvp(; N=6, total_time=0.1, time_step=0.01)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
@@ -87,7 +87,7 @@ function test_tdvp(; N=6, total_time=-0.1, time_step=-0.01)
   #
   H = prod(H)
   psi = prod(psi)
-  expH = exp(H * time_step)
+  expH = exp(H * (-im*time_step))
   szs_ed = zeros(nsweeps, N)
   for sweep in 1:nsweeps
     psi = noprime(psi * expH)

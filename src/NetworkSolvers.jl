@@ -8,7 +8,7 @@ include("sketched_linear_algebra/range_finder.jl")
 
 # Algorithms and interfaces
 include("eigsolve.jl")
-include("tdvp.jl")
+include("applyexp.jl")
 include("fitting.jl")
 
 # Tensor network algorithm components

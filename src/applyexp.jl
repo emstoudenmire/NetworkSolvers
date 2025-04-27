@@ -35,7 +35,7 @@ end
 function applyexp(
   H,
   init_state,
-  time_points;
+  exponents;
   extracter_kwargs=(;),
   updater_kwargs=(;),
   truncation_kwargs=(;),
@@ -47,7 +47,7 @@ function applyexp(
   H = permute_indices(H)
   init_state = permute_indices(init_state)
   init_prob = TDVPProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
-  time_steps = diff([0.0, time_points...])[2:end]
+  time_steps = diff([0.0, exponents...])[2:end]
   sweep_kws = (;
     outputlevel,
     extracter_kwargs,
@@ -62,4 +62,8 @@ function applyexp(
   return state(converged_prob)
 end
 
-tdvp(args...; kws...) = applyexp(args...; kws...)
+function tdvp(H, init_state, time_points; time_angle = 0.0, kws...) 
+  z = exp(-im*time_angle)
+  exponents = [(-im*z)*t for t in time_points]
+  return applyexp(H, init_state, exponents; kws...)
+end
