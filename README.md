@@ -22,6 +22,13 @@ by having a gauge object and using its state to change the behavior of
 
 ## To Do List
 
+- DMRG improvements
+    - [ ] Alternative sweeping schemes. Go into each subtree then
+          back out. May help subspace expansion to be more effective.
+    - [X] QN subspace expansion
+    - [X] Subspace expansion support
+    - [X] Maxdim etc. as a vector support
+
 - Test improvements:
   - [ ] Make examples runnable by runtests.jl
   - [ ] Test quench with 2-site TDVP + subspace
@@ -38,26 +45,19 @@ by having a gauge object and using its state to change the behavior of
         Does it make subspace more effective for 1-site?
 
 - [ ] TDVP improvements
-  - [ ] Implement 2-site region plan (maybe as separate function for now)
-  - [ ] Better way of detecting end of sweep and advancing the time step.
-        Possibly by querying `isnothing(next_region(region_iterator))`.
   - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
-  - [ ] Change "time" nomenclature to "exponents"? 
+  - [X] Implement 2-site region plan (maybe as separate function for now)
+  - [X] Better way of detecting end of sweep and advancing the time step.
+        Possibly by querying `isnothing(next_region(region_iterator))`.
+  - [X] Change "time" nomenclature to "exponents"? 
         Time can be misleading since there is no "im" included.
         Or put in "im" when calling through `tdvp`, but
         not when calling through `exponentiate` (is `integrate` a better name?)
-  - [ ] Timers through callbacks. How?
-        "Timed callback" adapter. Wraps callback in something like `time = @elapsed f()` 
-        and grab time through a closure?
   - [X] Redesign TDVP around an array of time steps
 
-- DMRG improvements
-    - [X] QN subspace expansion
-    - [X] Subspace expansion support
-    - [X] Maxdim etc. as a vector support
 
 - [ ] Add a kind of "checkdone" callback feature. Do we just do it 
-    for each algorithm?
+      for each algorithm?
 
 - Keyword argument handling:
   - [X] How to "mix" keyword argument packs?
@@ -72,22 +72,18 @@ by having a gauge object and using its state to change the behavior of
         set and assume the other is in the kws... pack? 
 
 - [ ] SweepIterator design questions
-
     - [ ] Maybe SweepIterator can just be
         `sweep_iterator(problem, kw_list) = [make_region_iterator(problem, kws) for kws in kw_list]`
-
     - [ ] Add sweep-level keyword arguments. 
         Where?
         Maybe in Sweeps array, like [(1,kws_sweep1), (2, kws_sweep2), ...]
         - [ ] Think of SweepIterator as just an adapter around region_iterator?
         - [ ] Just an iterator of iterators... also plugging in arguments
             to initialize each sub-iterator
-
     - [ ] Should SweepIterator actually iterate over whole problem (all sweeps)
         by default?
         Maybe... can think of the current version as adapter like
         `sweep_iterator(repeat_iterator(region_iterator)))`
-
     - [ ] Is SweepIterator just a fancier version of `Iterators.cycle`?
         I.e. one that lets one detect when each cycle is completed?
         Can we just tell people to use `cycle` if they want this behavior?
@@ -95,11 +91,6 @@ by having a gauge object and using its state to change the behavior of
 
 - [ ] Demonstrate iterator adapters, such as "take(iter, n)" that takes
       n steps at each iteration.
-
-- Subspace expansion improvements:
-    - [X] QN subspace support
-    - [X] Subspace kwargs tuple
-    - [X] Better or more automatic handling of expansion size
 
 ## Review of Julia iteration interface
 
