@@ -3,7 +3,7 @@ using Graphs: AbstractEdge
 
 function subspace_expand!(
   ::Backend"densitymatrix",
-  problem::EigsolveProblem,
+  problem,
   local_tensor,
   region_iterator;
   cutoff=default_cutoff(),
