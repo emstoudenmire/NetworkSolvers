@@ -1,6 +1,20 @@
 import ITensorNetworks as itn
 import NetworkSolvers as ns
 
+function ed_ground_state(H, psi0)
+  ITensors.disable_warn_order()
+  H = prod(H)
+  psi = prod(psi0)
+  # TODO: call KrylovKit instead
+  expH = exp(H*(-20.0))
+  for napply in 1:10
+    psi = noprime(expH*psi)
+    psi /= norm(psi)
+  end
+  E = scalar(prime(psi)*H*psi)
+  return E, psi
+end
+
 function ed_time_evolution(H::itn.AbstractITensorNetwork,psi::itn.AbstractITensorNetwork, time_points; normalize=false)
   ITensors.disable_warn_order()
   H = prod(H)
