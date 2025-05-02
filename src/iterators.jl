@@ -86,5 +86,5 @@ function region_iterator_action!(
 end
 
 function region_plan(problem; nsites, sweep_kwargs...)
-  return post_order_dfs_sweep(state(problem); nsites, sweep_kwargs...)
+  return euler_sweep(state(problem); nsites, sweep_kwargs...)
 end

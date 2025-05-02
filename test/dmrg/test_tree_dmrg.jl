@@ -64,7 +64,7 @@ include("../utilities/tree_graphs.jl")
   # Test 1-site DMRG with subspace expansion
   #
   nsites = 1
-  nsweeps = 10
+  nsweeps = 5
   subspace_kwargs = (; algorithm="densitymatrix", max_expand=8)
   cutoff = 1E-10
   maxdim = 200
