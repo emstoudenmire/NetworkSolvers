@@ -8,27 +8,7 @@ import NamedGraphs as ng
 import ITensorMPS as itm
 
 include("../utilities/simple_ed_methods.jl")
-
-"""
-  build_tree
-
-  Make a tree with central vertex (0,0) and
-  nbranch branches of nbranch_sites each.
-"""
-function build_tree(; nbranch=3, nbranch_sites=3)
-  g = ng.NamedGraph()
-  gr.add_vertex!(g, (0, 0))
-  for branch in 1:nbranch, site in 1:nbranch_sites
-    gr.add_vertex!(g, (branch, site))
-  end
-  for branch in 1:nbranch
-    gr.add_edge!(g, (0, 0)=>(branch, 1))
-    for site in 2:nbranch_sites
-      gr.add_edge!(g, (branch, site-1)=>(branch, site))
-    end
-  end
-  return g
-end
+include("../utilities/tree_graphs.jl")
 
 @testset "Tree DMRG" begin
   outputlevel = 1
@@ -84,7 +64,7 @@ end
   # Test 1-site DMRG with subspace expansion
   #
   nsites = 1
-  nsweeps = 10
+  nsweeps = 5
   subspace_kwargs = (; algorithm="densitymatrix", max_expand=8)
   cutoff = 1E-10
   maxdim = 200

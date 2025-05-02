@@ -62,7 +62,7 @@ function applyexp(
   return state(converged_prob)
 end
 
-function tdvp(H, init_state, time_points; time_angle = 0.0, kws...) 
+function tdvp(H, init_state, time_points; time_angle=0.0, kws...)
   z = exp(-im*time_angle)
   exponents = [(-im*z)*t for t in time_points]
   return applyexp(H, init_state, exponents; kws...)

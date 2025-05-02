@@ -1,7 +1,6 @@
-import Graphs: AbstractGraph
 
-function tdvp_regions(graph::AbstractGraph, time_step; updater_kwargs, kws...)
-  basic_fwd_sweep = basic_forward_sweep(graph; kws...)
+function tdvp_regions(graph, time_step; updater_kwargs, kws...)
+  basic_fwd_sweep = post_order_dfs_plan(graph; kws...)
 
   fwd_update = (; time_step=(+time_step/2), updater_kwargs...)
   rev_update = (; time_step=(-time_step/2), updater_kwargs...)

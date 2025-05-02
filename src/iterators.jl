@@ -86,5 +86,5 @@ function region_iterator_action!(
 end
 
 function region_plan(problem; nsites, sweep_kwargs...)
-  return basic_region_plan(state(problem); nsites, sweep_kwargs...)
+  return euler_sweep(state(problem); nsites, sweep_kwargs...)
 end

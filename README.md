@@ -22,6 +22,9 @@ by having a gauge object and using its state to change the behavior of
 
 ## To Do List
 
+- General improvements:
+    - [ ] replace calls like `tn[v] = T` with `set_index_preservegraph!`
+
 - DMRG improvements
     - [ ] Alternative sweeping schemes. Go into each subtree then
           back out. May help subspace expansion to be more effective.
