@@ -26,8 +26,8 @@ by having a gauge object and using its state to change the behavior of
     - [ ] replace calls like `tn[v] = T` with `set_index_preservegraph!`
 
 - DMRG improvements
-    - [ ] Alternative sweeping schemes. Go into each subtree then
-          back out. May help subspace expansion to be more effective.
+    - [X] Alternative sweeping schemes. Go into each subtree then
+          back out ("Euler tour"). May help subspace expansion to be more effective.
     - [X] QN subspace expansion
     - [X] Subspace expansion support
     - [X] Maxdim etc. as a vector support
@@ -48,7 +48,9 @@ by having a gauge object and using its state to change the behavior of
         Does it make subspace more effective for 1-site?
 
 - [ ] TDVP improvements
-  - [ ] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
+  - [ ] Implement Euler tour type plan for TDVP. Need to figure out if it 
+        does the right amount of time stepping per sweep and what order it is.
+  - [X] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
   - [X] Implement 2-site region plan (maybe as separate function for now)
   - [X] Better way of detecting end of sweep and advancing the time step.
         Possibly by querying `isnothing(next_region(region_iterator))`.
