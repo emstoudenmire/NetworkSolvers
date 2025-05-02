@@ -1,4 +1,4 @@
-import Graphs: AbstractGraph, dst, edges, src, vertices
+import Graphs: dst, edges, src, vertices
 import NamedGraphs as ng
 
 function compute_adjacencies(G)
@@ -44,5 +44,5 @@ end
 function euler_tour_vertices(G, start_vertex)
   edges = euler_tour_edges(G, start_vertex)
   isempty(edges) && return Vector{eltype(vertices(G))}[]
-  return [src(edges[1]),dst.(edges)...]
+  return [src(edges[1]), dst.(edges)...]
 end

@@ -24,7 +24,7 @@ include("permute_indices.jl")
 include("iterators.jl")
 include("adapters.jl")
 include("region_plans/euler_tour.jl")
-include("region_plans/region_plans.jl")
+include("region_plans/post_order_dfs.jl")
 include("region_plans/tdvp_region_plans.jl")
 include("alternating_update.jl")
 
