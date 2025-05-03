@@ -1,9 +1,7 @@
 import Graphs: dst, src
 import NamedGraphs.GraphsExtensions: default_root_vertex
 
-function euler_sweep(
-  graph; nsites, root_vertex=default_root_vertex(graph), sweep_kwargs...
-)
+function euler_sweep(graph; nsites, root_vertex=default_root_vertex(graph), sweep_kwargs...)
   if nsites == 1
     vertices = euler_tour_vertices(graph, root_vertex)
     sweep = [([v], sweep_kwargs) for v in vertices]

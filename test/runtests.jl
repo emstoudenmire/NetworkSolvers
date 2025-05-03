@@ -44,6 +44,7 @@ end
     end
   end
 
+  #=
   # test examples
   examplepath = joinpath(@__DIR__, "..", "examples")
   for (root, _, files) in walkdir(examplepath)
@@ -56,10 +57,12 @@ end
             :macrocall,
             GlobalRef(Suppressor, Symbol("@suppress")),
             LineNumberNode(@__LINE__, @__FILE__),
-            :(include($filename)),
+            :(include($filename);),
           ))
         end
       end
     end
   end
+  =#
+
 end

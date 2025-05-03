@@ -50,13 +50,13 @@ function eigsolve(
   extracter_kwargs=(;),
   updater_kwargs=(;),
   truncation_kwargs=(;),
-  subspace_kwargs=(;),
+  subspace_kwargs=(; algorithm="densitymatrix"),
   sweep_printer=eigsolve_sweep_printer,
   kws...,
 )
-  H = permute_indices(H)
-  init_state = permute_indices(init_state)
-  init_prob = EigsolveProblem(; state=copy(init_state), operator=itn.ProjTTN(H))
+  init_prob = EigsolveProblem(;
+    state=permute_indices(init_state), operator=itn.ProjTTN(permute_indices(H))
+  )
   sweep_iter = sweep_iterator(
     init_prob,
     nsweeps;
