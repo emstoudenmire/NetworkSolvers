@@ -26,6 +26,7 @@ by having a gauge object and using its state to change the behavior of
     - [ ] replace calls like `tn[v] = T` with `set_index_preservegraph!`
 
 - DMRG improvements
+    - [ ] Slow performance for QN-conserving case
     - [X] Alternative sweeping schemes. Go into each subtree then
           back out ("Euler tour"). May help subspace expansion to be more effective.
     - [X] QN subspace expansion
@@ -48,6 +49,9 @@ by having a gauge object and using its state to change the behavior of
         Does it make subspace more effective for 1-site?
 
 - [ ] TDVP improvements
+  - [ ] Possible bug when combining 1-site and subspace on tree networks
+        (came up for a network which was mostly a chain but had an extra ancilla site
+         connecting to the impurity site located in middle of the chain)
   - [ ] Implement Euler tour type plan for TDVP. Need to figure out if it 
         does the right amount of time stepping per sweep and what order it is.
   - [X] Fix "densitymatrix" subspace expansion to work with 1-site TDVP and test.
