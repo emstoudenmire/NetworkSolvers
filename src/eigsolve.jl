@@ -42,8 +42,7 @@ function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
 end
 
 function eigsolve(
-  H,
-  init_state;
+  init_prob;
   nsweeps,
   nsites=1,
   outputlevel=0,
@@ -54,9 +53,6 @@ function eigsolve(
   sweep_printer=eigsolve_sweep_printer,
   kws...,
 )
-  init_prob = EigsolveProblem(;
-    state=permute_indices(init_state), operator=itn.ProjTTN(permute_indices(H))
-  )
   sweep_iter = sweep_iterator(
     init_prob,
     nsweeps;
@@ -69,6 +65,13 @@ function eigsolve(
   )
   prob = alternating_update(sweep_iter; outputlevel, sweep_printer, kws...)
   return eigenvalue(prob), state(prob)
+end
+
+function eigsolve(H, init_state; kws...)
+  init_prob = EigsolveProblem(;
+    state=permute_indices(init_state), operator=itn.ProjTTN(permute_indices(H))
+  )
+  return eigsolve(init_prob; kws...)
 end
 
 dmrg(args...; kws...) = eigsolve(args...; kws...)
