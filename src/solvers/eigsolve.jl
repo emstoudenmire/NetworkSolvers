@@ -5,9 +5,9 @@ function eigsolve_solver(
   init;
   which_eigval=:SR,
   ishermitian=true,
-  tol=1e-10,
+  tol=1e-12,
   krylovdim=3,
-  maxiter=2,
+  maxiter=1,
   verbosity=0,
   eager=false,
   kws...,
