@@ -27,6 +27,9 @@ by having a gauge object and using its state to change the behavior of
 
 - DMRG improvements
     - [ ] Slow performance for QN-conserving case
+          --> tracked most of this back to suboptimal heuristic in projttn.jl
+              in ITensorNetworks. Order is psi*E1*w1*E2*w2 but should be psi*E1*w1*s2*E2
+              for 2-site DMRG.
     - [X] Alternative sweeping schemes. Go into each subtree then
           back out ("Euler tour"). May help subspace expansion to be more effective.
     - [X] QN subspace expansion

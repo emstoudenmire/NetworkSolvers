@@ -1,45 +1,41 @@
 import ITensorNetworks as itn
 using Printf
-import NetworkSolvers: current_region, region_iterator_action!, extracter!, updater!, inserter!, prepare_subspace!, eigenvalue, state, operator, eigsolve, eigsolve_solver, permute_indices
+import NetworkSolvers:
+  EigsolveProblem,
+  current_region,
+  region_iterator_action!,
+  extracter!,
+  updater!,
+  inserter!,
+  prepare_subspace!,
+  eigenvalue,
+  set!,
+  state,
+  operator,
+  eigsolve,
+  eigsolve_solver,
+  eigsolve_sweep_printer,
+  permute_indices
 
-@kwdef mutable struct ProblemTimings
+@kwdef mutable struct TimedEigsolveProblem{State,Operator}
+  eigprob::EigsolveProblem{State,Operator}
   extracter_time::Float64 = 0.0
   subspace_time::Float64 = 0.0
   updater_time::Float64 = 0.0
   inserter_time::Float64 = 0.0
 end
 
-function print(T::ProblemTimings)
-  @printf("  Extracter time = %.3f s\n", T.extracter_time)
-  @printf("  Subspace time = %.3f s\n", T.subspace_time)
-  @printf("  Updater time = %.3f s\n", T.updater_time)
-  @printf("  Inserter time = %.3f s\n", T.inserter_time)
+reset_timings(T::TimedEigsolveProblem) = TimedEigsolveProblem(; eigprob=T.eigprob)
+eigenvalue(E::TimedEigsolveProblem) = eigenvalue(E.eigprob)
+state(E::TimedEigsolveProblem) = state(E.eigprob)
+operator(E::TimedEigsolveProblem) = operator(E.eigprob)
+
+function set!(T::TimedEigsolveProblem; state=state(T), operator=operator(T), eigenvalue=eigenvalue(T))
+  T.eigprob = EigsolveProblem(; state, operator, eigenvalue)
 end
 
-@kwdef mutable struct TimedEigsolveProblem{State,Operator}
-  state::State
-  operator::Operator
-  eigenvalue::Number = Inf
-  timings::ProblemTimings = ProblemTimings()
-end
-
-eigenvalue(E::TimedEigsolveProblem) = E.eigenvalue
-state(E::TimedEigsolveProblem) = E.state
-operator(E::TimedEigsolveProblem) = E.operator
-
-function updater!(
-  E::TimedEigsolveProblem,
-  local_tensor,
-  region_iterator;
-  outputlevel,
-  solver=eigsolve_solver,
-  kws...,
-)
-  E.eigenvalue, local_tensor = solver(operator(E), local_tensor; kws...)
-  if outputlevel >= 2
-    @printf("  Region %s: energy = %.12f\n", current_region(region_iterator), eigenvalue(E))
-  end
-  return local_tensor
+function updater!(E::TimedEigsolveProblem, local_tensor, region_iterator; kws...)
+  return updater!(E.eigprob, local_tensor, region_iterator; kws...)
 end
 
 function region_iterator_action!(
@@ -52,51 +48,45 @@ function region_iterator_action!(
   sweep,
   kwargs...,
 )
-  problem.timings.extracter_time += @elapsed begin
+  problem.extracter_time += @elapsed begin
     local_tensor = extracter!(problem, region_iterator; extracter_kwargs..., kwargs...)
   end
-  problem.timings.subspace_time += @elapsed begin
+  problem.subspace_time += @elapsed begin
     local_tensor = prepare_subspace!(
       problem, local_tensor, region_iterator; subspace_kwargs..., sweep, kwargs...
     )
   end
-  problem.timings.updater_time += @elapsed begin
-    local_tensor = updater!(problem, local_tensor, region_iterator; updater_kwargs..., kwargs...)
+  problem.updater_time += @elapsed begin
+    local_tensor = updater!(
+      problem, local_tensor, region_iterator; updater_kwargs..., kwargs...
+    )
   end
-  problem.timings.inserter_time += @elapsed begin
-    inserter!(problem, local_tensor, region_iterator; sweep, truncation_kwargs..., kwargs...)
+  problem.inserter_time += @elapsed begin
+    inserter!(
+      problem, local_tensor, region_iterator; sweep, truncation_kwargs..., kwargs...
+    )
   end
   return nothing
 end
 
-function timed_eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
+function timed_eigsolve_sweep_printer(problem; outputlevel, kws...)
+  eigsolve_sweep_printer(problem.eigprob; outputlevel, kws...)
   if outputlevel >= 1
-    psi = state(problem)
-    if nsweeps >= 10
-      @printf("After sweep %02d/%d ", sweep, nsweeps)
-    else
-      @printf("After sweep %d/%d ", sweep, nsweeps)
-    end
-    @printf("eigenvalue=%.12f ", eigenvalue(problem))
-    @printf("maxlinkdim=%d", itn.maxlinkdim(psi))
-    println()
-    print(problem.timings)
-    problem.timings = ProblemTimings()
+    @printf("  Extracter time = %.3f s\n", problem.extracter_time)
+    @printf("  Subspace time = %.3f s\n", problem.subspace_time)
+    @printf("  Updater time = %.3f s\n", problem.updater_time)
+    @printf("  Inserter time = %.3f s\n", problem.inserter_time)
+    problem = reset_timings(problem)
     println()
     flush(stdout)
   end
 end
 
-function timed_eigsolve(
-  H,
-  init_state;
-  sweep_printer=timed_eigsolve_sweep_printer,
-  kws...,
-)
-  init_prob = TimedEigsolveProblem(;
-    state=permute_indices(init_state), operator=itn.ProjTTN(permute_indices(H))
+function timed_eigsolve(H, ψ0; sweep_printer=timed_eigsolve_sweep_printer, kws...)
+  eigprob = EigsolveProblem(;
+    state=permute_indices(ψ0), operator=itn.ProjTTN(permute_indices(H))
   )
-  return eigsolve(init_prob; sweep_printer, kws...)
+  return eigsolve(TimedEigsolveProblem(; eigprob); sweep_printer, kws...)
 end
 
 timed_dmrg(args...; kws...) = timed_eigsolve(args...; kws...)
