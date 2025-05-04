@@ -2,17 +2,16 @@ using KrylovKit: KrylovKit
 
 function eigsolve_solver(
   operator,
-  init;
+  init, howmany=1;
   which_eigval=:SR,
   ishermitian=true,
-  tol=1e-12,
+  tol=1E-14,
   krylovdim=3,
   maxiter=1,
   verbosity=0,
   eager=false,
   kws...,
 )
-  howmany = 1
   vals, vecs, info = KrylovKit.eigsolve(
     operator,
     init,
