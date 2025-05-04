@@ -17,6 +17,16 @@ overlapnetwork(F::FittingProblem) = F.overlapnetwork
 state(F::FittingProblem) = F.state
 gauge_region(F::FittingProblem) = F.gauge_region
 
+function set!(
+  F::FittingProblem;
+  state=state(F),
+  overlapnetwork=overlapnetwork(F),
+  gauge_region=gauge_region(F),
+  overlap=overlap(F),
+)
+  F = FittingProblem(; state, overlapnetwork, gauge_region, overlap)
+end
+
 function extracter!(problem::FittingProblem, region_iterator; kws...)
   region = current_region(region_iterator)
   prev_region = gauge_region(problem)
@@ -33,10 +43,7 @@ function extracter!(problem::FittingProblem, region_iterator; kws...)
   o_tn = itn.update(
     itn.Algorithm("bp"), o_tn, pe_path; message_update_function_kwargs=(; normalize=false)
   )
-
-  problem.state = tn
-  problem.overlapnetwork = o_tn
-  problem.gauge_region = region
+  set!(problem; state=tn, overlapnetwork=o_tn, gauge_region=region)
 
   local_tensor = itn.environment(o_tn, region)
   sequence = itn.contraction_sequence(local_tensor; alg="optimal")

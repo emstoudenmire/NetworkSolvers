@@ -6,9 +6,10 @@ default_max_expand() = 4
 
 function prepare_subspace!(problem, local_tensor, region_iterator; sweep, kws...)
   local_tensor = subspace_expand!(problem, local_tensor, region_iterator; sweep, kws...)
-  problem.operator = itn.position(
+  shifted_operator = itn.position(
     operator(problem), state(problem), current_region(region_iterator)
   )
+  set!(problem; operator=shifted_operator)
   return local_tensor
 end
 

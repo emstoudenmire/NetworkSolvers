@@ -11,6 +11,12 @@ state(tdvp::TDVPProblem) = tdvp.state
 operator(tdvp::TDVPProblem) = tdvp.operator
 current_time(tdvp::TDVPProblem) = tdvp.current_time
 
+function set!(
+  T::TDVPProblem; state=state(T), operator=operator(T), current_time=current_time(T)
+)
+  T = TDVPProblem(; state, operator, current_time)
+end
+
 function region_plan(tdvp::TDVPProblem; nsites, time_step, sweep_kwargs...)
   return tdvp_regions(state(tdvp), time_step; nsites, sweep_kwargs...)
 end

@@ -20,7 +20,8 @@ function inserter!(
   if region isa ng.NamedEdge
     psi = state(problem)
     psi[Graphs.dst(region)] *= local_tensor
-    problem.state = itn.set_ortho_region(psi, [Graphs.dst(region)])
+    psi = itn.set_ortho_region(psi, [Graphs.dst(region)])
+    set!(problem; state=psi)
     return nothing
   elseif length(region) == 2
     e = ng.edgetype(psi)(first(region), last(region))
@@ -37,6 +38,6 @@ function inserter!(
   psi[v] = C
   psi = set_orthogonal_region ? itn.set_ortho_region(psi, [v]) : psi
   normalize && (psi[v] /= norm(psi[v]))
-  problem.state = psi
+  set!(problem; state=psi)
   return nothing
 end

@@ -11,6 +11,12 @@ eigenvalue(E::EigsolveProblem) = E.eigenvalue
 state(E::EigsolveProblem) = E.state
 operator(E::EigsolveProblem) = E.operator
 
+function set!(
+  E::EigsolveProblem; state=E.state, operator=E.operator, eigenvalue=E.eigenvalue
+)
+  E = EigsolveProblem(; state, operator, eigenvalue)
+end
+
 function updater!(
   E::EigsolveProblem,
   local_tensor,

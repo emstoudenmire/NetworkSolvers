@@ -14,7 +14,6 @@ function extracter!(problem, region_iterator; kws...)
     psi = itn.orthogonalize(state(problem), region)
     local_tensor = prod(psi[v] for v in region)
   end
-  problem.state = psi
-
+  set!(problem; state=psi)
   return local_tensor
 end
