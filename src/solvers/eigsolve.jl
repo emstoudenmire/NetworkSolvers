@@ -2,7 +2,8 @@ using KrylovKit: KrylovKit
 
 function eigsolve_solver(
   operator,
-  init, howmany=1;
+  init,
+  howmany=1;
   which_eigval=:SR,
   ishermitian=true,
   tol=1E-14,
