@@ -60,7 +60,7 @@ function applyexp(
   )
   kws_array = [(; sweep_kws..., time_step=t) for t in time_steps]
   sweep_iter = sweep_iterator(init_prob, kws_array)
-  converged_prob = alternating_update(sweep_iter; outputlevel, kws...)
+  converged_prob = sweep_solve(sweep_iter; outputlevel, kws...)
   return state(converged_prob)
 end
 

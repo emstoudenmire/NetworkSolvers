@@ -69,7 +69,7 @@ function eigsolve(
     truncation_kwargs,
     subspace_kwargs,
   )
-  prob = alternating_update(sweep_iter; outputlevel, sweep_printer, kws...)
+  prob = sweep_solve(sweep_iter; outputlevel, sweep_printer, kws...)
   return eigenvalue(prob), state(prob)
 end
 

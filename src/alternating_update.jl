@@ -11,7 +11,7 @@ function default_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
   end
 end
 
-function alternating_update(
+function sweep_solve(
   sweep_iterator;
   outputlevel=0,
   region_callback=default_region_callback,
