@@ -24,7 +24,10 @@ function set!(
   gauge_region=gauge_region(F),
   overlap=overlap(F),
 )
-  F = FittingProblem(; state, overlapnetwork, gauge_region, overlap)
+  F.state = state
+  F.overlapnetwork = overlapnetwork
+  F.overlap = overlap
+  F.gauge_region = gauge_region
 end
 
 function extracter!(problem::FittingProblem, region_iterator; kws...)
@@ -88,7 +91,7 @@ function fit_tensornetwork(
   common_sweep_kwargs = (; nsites, outputlevel, updater_kwargs, truncation_kwargs)
   kwargs_array = [(; common_sweep_kwargs..., sweep=s) for s in 1:nsweeps]
   sweep_iter = sweep_iterator(init_prob, kwargs_array)
-  converged_prob = alternating_update(sweep_iter; outputlevel, kws...)
+  converged_prob = sweep_solve(sweep_iter; outputlevel, kws...)
   return itn.rename_vertices(itn.inv_vertex_map(overlap_network), state(converged_prob))
 end
 

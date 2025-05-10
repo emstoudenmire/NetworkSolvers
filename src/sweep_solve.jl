@@ -6,12 +6,10 @@ default_sweep_callback(problem; kws...) = nothing
 function default_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
   if outputlevel >= 1
     println("Done with sweep $sweep/$nsweeps")
-    #println(" CPU time=", round(sweep_time; digits=3))
-    flush(stdout)
   end
 end
 
-function alternating_update(
+function sweep_solve(
   sweep_iterator;
   outputlevel=0,
   region_callback=default_region_callback,

@@ -14,7 +14,9 @@ operator(E::EigsolveProblem) = E.operator
 function set!(
   E::EigsolveProblem; state=E.state, operator=E.operator, eigenvalue=E.eigenvalue
 )
-  E = EigsolveProblem(; state, operator, eigenvalue)
+  E.state = state
+  E.operator = operator
+  E.eigenvalue = eigenvalue
 end
 
 function updater!(
@@ -69,7 +71,7 @@ function eigsolve(
     truncation_kwargs,
     subspace_kwargs,
   )
-  prob = alternating_update(sweep_iter; outputlevel, sweep_printer, kws...)
+  prob = sweep_solve(sweep_iter; outputlevel, sweep_printer, kws...)
   return eigenvalue(prob), state(prob)
 end
 

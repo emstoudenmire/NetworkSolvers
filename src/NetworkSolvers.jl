@@ -27,6 +27,6 @@ include("region_plans/euler_tour.jl")
 include("region_plans/euler_plans.jl")
 include("region_plans/dfs_plans.jl")
 include("region_plans/tdvp_region_plans.jl")
-include("alternating_update.jl")
+include("sweep_solve.jl")
 
 end
