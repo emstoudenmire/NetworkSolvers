@@ -62,7 +62,7 @@ function tree_dmrg(; conserve_qns=false)
   nsweeps = 14
   nsites = 1
   cutoff = 1E-9
-  maxdim = 50
+  maxdim = 20
   outputlevel = 2
   truncation_kwargs = (; cutoff, maxdim)
   subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
