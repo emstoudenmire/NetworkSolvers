@@ -33,9 +33,11 @@ function updater!(
   kws...,
 )
   local_tensor, info = solver(operator(T), time_step, local_tensor; kws...)
-  if outputlevel >= 2 && is_last_region(region_iterator)
-    T.current_time += 2*time_step  # currently assuming second-order method
-    @printf("  Current time = %s\n", current_time(T))
+  if is_last_region(region_iterator)
+    T.current_time += 2*abs(time_step)  # currently assuming second-order method
+    if outputlevel >= 2
+      @printf("  Current time = %s\n", current_time(T))
+    end
   end
   return local_tensor
 end
