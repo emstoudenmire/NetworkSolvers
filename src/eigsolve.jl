@@ -14,7 +14,9 @@ operator(E::EigsolveProblem) = E.operator
 function set!(
   E::EigsolveProblem; state=E.state, operator=E.operator, eigenvalue=E.eigenvalue
 )
-  E = EigsolveProblem(; state, operator, eigenvalue)
+  E.state = state
+  E.operator = operator
+  E.eigenvalue = eigenvalue
 end
 
 function updater!(

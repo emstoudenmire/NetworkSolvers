@@ -24,7 +24,10 @@ function set!(
   gauge_region=gauge_region(F),
   overlap=overlap(F),
 )
-  F = FittingProblem(; state, overlapnetwork, gauge_region, overlap)
+  F.state = state
+  F.overlapnetwork = overlapnetwork
+  F.overlap = overlap
+  F.gauge_region = gauge_region
 end
 
 function extracter!(problem::FittingProblem, region_iterator; kws...)
