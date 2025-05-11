@@ -35,8 +35,8 @@ include("../utilities/tree_graphs.jl")
   psi0 = itn.ttn(state, sites)
 
   (outputlevel >= 1) && println("Computing exact ground state")
-  Ex, psix = ed_ground_state(H,psi0)
-  (outputlevel >= 1) && println("Ex = ",Ex)
+  Ex, psix = ed_ground_state(H, psi0)
+  (outputlevel >= 1) && println("Ex = ", Ex)
 
   cutoff = 1E-5
   maxdim = 40
@@ -56,9 +56,8 @@ include("../utilities/tree_graphs.jl")
     subspace_kwargs,
     outputlevel,
   )
-  (outputlevel >= 1) && println("2-site DMRG energy = ",E)
+  (outputlevel >= 1) && println("2-site DMRG energy = ", E)
   @test abs(E-Ex) < 1E-5
-
 
   #
   # Test 1-site DMRG with subspace expansion
@@ -77,7 +76,6 @@ include("../utilities/tree_graphs.jl")
     subspace_kwargs,
     outputlevel,
   )
-  (outputlevel >= 1) && println("1-site+subspace DMRG energy = ",E)
+  (outputlevel >= 1) && println("1-site+subspace DMRG energy = ", E)
   @test abs(E-Ex) < 1E-5
-
 end

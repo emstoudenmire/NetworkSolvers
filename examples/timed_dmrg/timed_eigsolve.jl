@@ -30,7 +30,9 @@ eigenvalue(E::TimedEigsolveProblem) = eigenvalue(E.eigprob)
 state(E::TimedEigsolveProblem) = state(E.eigprob)
 operator(E::TimedEigsolveProblem) = operator(E.eigprob)
 
-function set!(T::TimedEigsolveProblem; state=state(T), operator=operator(T), eigenvalue=eigenvalue(T))
+function set!(
+  T::TimedEigsolveProblem; state=state(T), operator=operator(T), eigenvalue=eigenvalue(T)
+)
   T.eigprob = EigsolveProblem(; state, operator, eigenvalue)
 end
 

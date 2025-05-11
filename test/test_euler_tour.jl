@@ -7,11 +7,11 @@ include("utilities/tree_graphs.jl")
 @testset "Euler tour" begin
   g = build_tree(; nbranch=3, nbranch_sites=3)
 
-  start_vertex = (0,0)
+  start_vertex = (0, 0)
 
   edge_tour = ns.euler_tour_edges(g, start_vertex)
-  for j in 1:length(edge_tour)-1
-    @test dst(edge_tour[j]) == src(edge_tour[j+1])
+  for j in 1:(length(edge_tour) - 1)
+    @test dst(edge_tour[j]) == src(edge_tour[j + 1])
   end
   for e in edges(g)
     @test e in edge_tour

@@ -15,7 +15,12 @@ function ed_ground_state(H, psi0)
   return E, psi
 end
 
-function ed_time_evolution(H::itn.AbstractITensorNetwork,psi::itn.AbstractITensorNetwork, time_points; normalize=false)
+function ed_time_evolution(
+  H::itn.AbstractITensorNetwork,
+  psi::itn.AbstractITensorNetwork,
+  time_points;
+  normalize=false,
+)
   ITensors.disable_warn_order()
   H = prod(H)
   psi = prod(psi)

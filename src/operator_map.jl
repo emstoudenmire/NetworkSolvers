@@ -22,17 +22,17 @@ function apply_operator_map(P::itn.ProjTTN, ψ)
     for edge in ie
       if itn.dst(edge) == first(region)
         #println("Applying E[$edge]")
-        ψ *= itn.environment(P,edge)
+        ψ *= itn.environment(P, edge)
       end
     end
     for s in itn.sites(P)
-        #println("Applying O[$s]")
+      #println("Applying O[$s]")
       ψ *= itn.operator(P)[s]
     end
     for edge in ie
       if itn.dst(edge) != first(region)
         #println("Applying E[$edge]")
-        ψ *= itn.environment(P,edge)
+        ψ *= itn.environment(P, edge)
       end
     end
   end

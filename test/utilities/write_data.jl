@@ -14,4 +14,4 @@ function write_data(fname::AbstractString, xv, yv)
   close(f)
 end
 
-write_data(fname::AbstractString, yv) = write_data(fname,1:length(yv),yv)
+write_data(fname::AbstractString, yv) = write_data(fname, 1:length(yv), yv)
