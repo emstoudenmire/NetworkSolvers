@@ -50,7 +50,7 @@ include("../utilities/tree_graphs.jl")
   E, psi = ns.dmrg(
     H,
     psi0;
-    inserter_kwargs=(; cutoff, maxdim),
+    truncation_kwargs=(; cutoff, maxdim),
     nsites,
     nsweeps,
     subspace_kwargs,
@@ -70,7 +70,7 @@ include("../utilities/tree_graphs.jl")
   E, psi = ns.dmrg(
     H,
     psi0;
-    inserter_kwargs=(; cutoff, maxdim),
+    truncation_kwargs=(; cutoff, maxdim),
     nsites,
     nsweeps,
     subspace_kwargs,
