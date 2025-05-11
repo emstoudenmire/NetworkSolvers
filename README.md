@@ -10,15 +10,28 @@ https://docs.sciml.ai/DiffEqDocs/stable/basics/integrator/
 Matt's Gist for an early iterators design scheme is here:
 https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
-## Notes on New One-Site Design
+## Timing Notes
 
-A challenge of introducing a new vertex to hold the "bond" tensor is:
-how do we 'detect' that this is what we did in later code?
-In NetworkSolvers, we can keep the old region around.
+- May 11 (main 60cbc1c). Representative timings of DMRG and TDVP.
 
-Ideally we might handle this inside the TreeTensorNetwork or ITensorNetwork
-by having a gauge object and using its state to change the behavior of
-`orthogonalize` or `gauge_walk` etc.
+  NetworkSolvers DMRG.  nsites=1 
+  subspace_kwargs=(; algorithm="densitymatrix", maxdim=4)
+  nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
+  conserve_qns=false: 16.1s
+  conserve_qns=true:  10.3s
+
+  NetworkSolvers DMRG. nsites=2
+  subspace_kwargs=(;)
+  nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
+  conserve_qns=false: 10.1s
+  conserve_qns=true:  12.1s <-- slower than without QNs
+
+  ITensorMPS DMRG. nsites=2
+  nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
+  conserve_qns=false: 5.1s
+  conserve_qns=true:  4.6s
+
+
 
 ## To Do List
 

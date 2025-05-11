@@ -23,7 +23,7 @@ function dmrg(; N=10, nsites=2, site_type="S=1", conserve_qns=false)
   end
   psi = itn.ttn(state, s)
 
-  nsweeps = 8
+  nsweeps = 5
   cutoff = 1E-9
   maxdim = [10, 40, 80, 160]
   outputlevel = 1
