@@ -13,7 +13,7 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 ## Timing Notes
 
 - May 11 (main 60cbc1c). Representative timings of DMRG and TDVP.
-
+  ```
   NetworkSolvers DMRG.  nsites=1 
   subspace_kwargs=(; algorithm="densitymatrix", maxdim=4)
   nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
@@ -26,12 +26,39 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
   conserve_qns=false: 10.1s
   conserve_qns=true:  12.1s <-- slower than without QNs
 
+  NetworkSolvers TDVP.
+  total_time=1.0, time_step=0.1, conserve_qns=false, maxdim=16
+  nsites=1:  4.2s
+  nsites=2: 11.2s
+
   ITensorMPS DMRG. nsites=2
   nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
   conserve_qns=false: 5.1s
   conserve_qns=true:  4.6s
+  ```
 
+- After operator map workaround:
+  ```
+  NetworkSolvers DMRG.  nsites=1 
+  subspace_kwargs=(; algorithm="densitymatrix", maxdim=4)
+  nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
+  conserve_qns=false: 14.7s
+  conserve_qns=true:  10.3s
+  --> why are bond dimensions saturating maxdims?
+      subspace yes, but is cutoff not being applied during inserter step?
 
+  NetworkSolvers DMRG. nsites=2
+  subspace_kwargs=(;)
+  nsweeps=5, N=100, cutoff=1E-9, maxdim=[10, 40, 80, 160]
+  conserve_qns=false:  5.6s
+  conserve_qns=true:   5.1s
+  --> timings much closer to ITensorMPS DMRG now (bond dimensions slightly different).
+
+  NetworkSolvers TDVP.
+  total_time=1.0, time_step=0.1, conserve_qns=false, maxdim=16
+  nsites=1: 3.2s (down from 4.2s, 1.3x speedup)
+  nsites=2: 7.2s (down from 11.2s, 1.5x speedup)
+  ```
 
 ## To Do List
 
