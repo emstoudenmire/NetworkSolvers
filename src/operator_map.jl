@@ -6,7 +6,7 @@ import ITensorNetworks as itn
 # in the projected_operator_tensors(P::ProjTTN) function (line 97 or so)
 #
 
-function apply_operator_map(P::itn.ProjTTN, ψ)
+function operator_map(P::itn.ProjTTN, ψ)
   ψ = copy(ψ)
   if itn.on_edge(P)
     for edge in itn.incident_edges(P)
