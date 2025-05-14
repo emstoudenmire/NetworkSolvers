@@ -27,7 +27,8 @@ function updater!(
   solver=eigsolve_solver,
   kws...,
 )
-  E.eigenvalue, local_tensor = solver(ψ->operator_map(operator(E),ψ), local_tensor; kws...)
+  E.eigenvalue, local_tensor = solver(ψ->optimal_map(operator(E), ψ), local_tensor; kws...)
+  #E.eigenvalue, local_tensor = solver(ψ->operator_map(operator(E),ψ), local_tensor; kws...)
   if outputlevel >= 2
     @printf("  Region %s: energy = %.12f\n", current_region(region_iterator), eigenvalue(E))
   end

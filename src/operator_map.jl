@@ -1,11 +1,18 @@
 import ITensorNetworks as itn
+using TensorOperations: TensorOperations
 
-#
+function optimal_map(P::itn.ProjTTN, ψ)
+  envs = [itn.environment(P, e) for e in itn.incident_edges(P)]
+  site_ops = [itn.operator(P)[s] for s in itn.sites(P)]
+  contract_list = [envs..., site_ops..., ψ]
+  sequence = itn.contraction_sequence(contract_list; alg="optimal")
+  Pψ = itn.contract(contract_list; sequence)
+  return noprime(Pψ)
+end
+
 # This function is a workaround for the slow contraction order
 # heuristic in ITensorNetworks/src/treetensornetworks/projttns/projttn.jl
 # in the projected_operator_tensors(P::ProjTTN) function (line 97 or so)
-#
-
 function operator_map(P::itn.ProjTTN, ψ)
   ψ = copy(ψ)
   if itn.on_edge(P)
@@ -18,24 +25,19 @@ function operator_map(P::itn.ProjTTN, ψ)
     # TODO: improvement ideas
     # - check which vertex (first(region) vs. last(region)
     #   has more incident edges and contract those environments first
-    # - use automatic contraction order finding
     for edge in ie
       if itn.dst(edge) == first(region)
-        #println("Applying E[$edge]")
         ψ *= itn.environment(P, edge)
       end
     end
     for s in itn.sites(P)
-      #println("Applying O[$s]")
       ψ *= itn.operator(P)[s]
     end
     for edge in ie
       if itn.dst(edge) != first(region)
-        #println("Applying E[$edge]")
         ψ *= itn.environment(P, edge)
       end
     end
   end
-  #ITensors.pause()
   return noprime(ψ)
 end

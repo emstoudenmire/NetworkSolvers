@@ -32,7 +32,9 @@ function updater!(
   outputlevel,
   kws...,
 )
-  local_tensor, info = solver(ψ->operator_map(operator(T),ψ), time_step, local_tensor; kws...)
+  local_tensor, info = solver(
+    ψ->optimal_map(operator(T), ψ), time_step, local_tensor; kws...
+  )
   if is_last_region(region_iterator)
     T.current_time += 2*abs(time_step)  # currently assuming second-order method
     if outputlevel >= 2
