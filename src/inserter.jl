@@ -19,7 +19,7 @@ function inserter!(
   psi = state(problem)
   if region isa ng.NamedEdge
     psi = state(problem)
-    #Is there a world in which this modifies the graph structure, if not setindex also should be used here for efficiency
+    #Is there a world in which this modifies the graph structure, if not preserve_graph also should be used here for efficiency
     psi[Graphs.dst(region)] *= local_tensor
     psi = itn.set_ortho_region(psi, [Graphs.dst(region)])
     set!(problem; state=psi)
@@ -29,16 +29,16 @@ function inserter!(
     indsTe = it.inds(psi[first(region)])
     tags = it.tags(psi, e)
     U, C, _ = it.factorize(local_tensor, indsTe; tags, maxdim, mindim, cutoff)
-    itn.setindex_preserve_graph!(psi, U, first(region))
+    itn.@preserve_graph psi[first(region)] = U
   elseif length(region) == 1
     C = local_tensor
   else
     error("Region of length $(length(region)) not currently supported")
   end
   v = last(region)
-  itn.setindex_preserve_graph!(psi, C, v)
+  itn.@preserve_graph psi[v] = C
   psi = set_orthogonal_region ? itn.set_ortho_region(psi, [v]) : psi
-  normalize && itn.setindex_preserve_graph!(psi, psi[v] / norm(psi[v]), v)
+  normalize && itn.@preserve_graph psi[v] = psi[v] / norm(psi[v])
   set!(problem; state=psi)
   return nothing
 end
