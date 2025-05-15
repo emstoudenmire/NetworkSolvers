@@ -2,30 +2,35 @@ import ITensorNetworks as itn
 import ITensors as it
 import Graphs: vertices
 import NamedGraphs.PartitionedGraphs as npg
-using NamedGraphs: NamedEdge
+using NamedGraphs: AbstractNamedGraph, NamedEdge
 using Printf
 
-@kwdef mutable struct FittingProblem{State,OverlapNetwork}
+@kwdef mutable struct FittingProblem{State<:itn.AbstractBeliefPropagationCache}
   state::State
-  overlapnetwork::OverlapNetwork
+  ket_graph::AbstractNamedGraph
   overlap::Number = 0
   gauge_region
 end
 
 overlap(F::FittingProblem) = F.overlap
-overlapnetwork(F::FittingProblem) = F.overlapnetwork
 state(F::FittingProblem) = F.state
+ket_graph(F::FittingProblem) = F.ket_graph
 gauge_region(F::FittingProblem) = F.gauge_region
+
+function ket(F::FittingProblem)
+  ket_vertices = vertices(ket_graph(F))
+  return first(itn.induced_subgraph(itn.tensornetwork(state(F)), ket_vertices))
+end
 
 function set!(
   F::FittingProblem;
+  ket_graph=ket_graph(F),
   state=state(F),
-  overlapnetwork=overlapnetwork(F),
   gauge_region=gauge_region(F),
   overlap=overlap(F),
 )
+  F.ket_graph = ket_graph
   F.state = state
-  F.overlapnetwork = overlapnetwork
   F.overlap = overlap
   F.gauge_region = gauge_region
 end
@@ -34,21 +39,15 @@ function extracter!(problem::FittingProblem, region_iterator; kws...)
   region = current_region(region_iterator)
   prev_region = gauge_region(problem)
   tn = state(problem)
-  o_tn = itn.update_factors(
-    overlapnetwork(problem), Dict(zip(region, [tn[v] for v in prev_region]))
-  )
-  path = itn.edge_sequence_between_regions(tn, prev_region, region)
+  path = itn.edge_sequence_between_regions(ket_graph(problem), prev_region, region)
   tn = itn.gauge_walk(itn.Algorithm("orthogonalize"), tn, path)
-  verts = unique(vcat(src.(path), dst.(path)))
-  factors = [tn[v] for v in verts]
-  o_tn = itn.update_factors(o_tn, Dict(zip(verts, factors)))
-  pe_path = npg.partitionedges(itn.partitioned_tensornetwork(o_tn), path)
-  o_tn = itn.update(
-    itn.Algorithm("bp"), o_tn, pe_path; message_update_function_kwargs=(; normalize=false)
+  pe_path = npg.partitionedges(itn.partitioned_tensornetwork(tn), path)
+  tn = itn.update(
+    itn.Algorithm("bp"), tn, pe_path; message_update_function_kwargs=(; normalize=false)
   )
-  set!(problem; state=tn, overlapnetwork=o_tn, gauge_region=region)
+  set!(problem; state=tn, gauge_region=region)
 
-  local_tensor = itn.environment(o_tn, region)
+  local_tensor = itn.environment(tn, region)
   sequence = itn.contraction_sequence(local_tensor; alg="optimal")
   local_tensor = dag(it.contract(local_tensor; sequence))
 
@@ -69,6 +68,10 @@ function updater!(F::FittingProblem, local_tensor, region; outputlevel, kws...)
   return local_tensor
 end
 
+function region_plan(F::FittingProblem; nsites, sweep_kwargs...)
+  return euler_sweep(ket_graph(F); nsites, sweep_kwargs...)
+end
+
 function fit_tensornetwork(
   overlap_network,
   args...;
@@ -81,10 +84,15 @@ function fit_tensornetwork(
   normalize=true,
   kws...,
 )
-  overlap_bpc = itn.BeliefPropagationCache(overlap_network, args...)
-  ket_tn = first(itn.induced_subgraph(overlap_network, itn.ket_vertices(overlap_network)))
+  bpc = itn.BeliefPropagationCache(overlap_network, args...)
+  ket_vertices = itn.ket_vertices(overlap_network)
+  ket_graph = first(
+    itn.induced_subgraph(
+      itn.underlying_graph(overlap_network), itn.ket_vertices(overlap_network)
+    ),
+  )
   init_prob = FittingProblem(;
-    state=ket_tn, overlapnetwork=overlap_bpc, gauge_region=collect(vertices(ket_tn))
+    ket_graph=ket_graph, state=bpc, gauge_region=collect(vertices(ket_graph))
   )
 
   truncation_kwargs = (; truncation_kwargs..., normalize, set_orthogonal_region=false)
@@ -92,7 +100,7 @@ function fit_tensornetwork(
   kwargs_array = [(; common_sweep_kwargs..., sweep=s) for s in 1:nsweeps]
   sweep_iter = sweep_iterator(init_prob, kwargs_array)
   converged_prob = sweep_solve(sweep_iter; outputlevel, kws...)
-  return itn.rename_vertices(itn.inv_vertex_map(overlap_network), state(converged_prob))
+  return itn.rename_vertices(itn.inv_vertex_map(overlap_network), ket(converged_prob))
 end
 
 function fit_tensornetwork(tn, init_state, args...; kwargs...)
