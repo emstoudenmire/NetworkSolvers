@@ -67,11 +67,18 @@ function applyexp(
   outputlevel=0,
   nsites=1,
   subspace_kwargs=(;),
+  tdvp_order=4,
   kws...,
 )
   time_steps = diff([0.0, exponents...])[2:end]
   sweep_kws = (;
-    outputlevel, extracter_kwargs, inserter_kwargs, nsites, subspace_kwargs, updater_kwargs
+    outputlevel,
+    extracter_kwargs,
+    inserter_kwargs,
+    nsites,
+    subspace_kwargs,
+    tdvp_order,
+    updater_kwargs,
   )
   kws_array = [(; sweep_kws..., time_step=t) for t in time_steps]
   sweep_iter = sweep_iterator(init_prob, kws_array)

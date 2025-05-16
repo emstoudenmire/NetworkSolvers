@@ -15,6 +15,8 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 - Misc. improvements:
     - [ ] replace calls like `tn[v] = T` with `set_index_preservegraph!`
     - [ ] Make root vertex be 1 for MPS / path_graph?
+    - [ ] Should 'nsites' keyword be put into something like extracter/updater/inserter kwargs or is 
+          it more "global". Can it be left out and just inferred from region sizes?
     - [X] Split subspace arguments like maxdim back into subspace_kwargs, not using truncation_kwargs.
           Rename truncation_kwargs back to inserter_kwargs.
     - [X] Reconceptualize local_tensor as local_state, which might be a collection of tensors, etc.
