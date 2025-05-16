@@ -17,7 +17,7 @@ function print_linkdims(psi)
   end
 end
 
-function quench(; N=8, total_time=4.0, time_step=0.05, cutoff=1E-14, maxdim=5000)
+function quench(; N=8, total_time=4.0, time_step=0.05, cutoff=1E-14, maxdim=5000, tdvp_order=4)
   sites = itn.siteinds("S=1/2", N)
 
   os = mps.OpSum()
@@ -62,6 +62,7 @@ function quench(; N=8, total_time=4.0, time_step=0.05, cutoff=1E-14, maxdim=5000
     truncation_kwargs,
     updater_kwargs,
     outputlevel,
+    tdvp_order
   )
 
   print_linkdims(psif)
