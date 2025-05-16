@@ -1,47 +1,61 @@
 import ITensorNetworks as itn
 using Printf
 
-@kwdef mutable struct TDVPProblem{State}
+@kwdef mutable struct ApplyExpProblem{State}
   state::State
   operator
   current_time::Number = 0.0
 end
 
-state(tdvp::TDVPProblem) = tdvp.state
-operator(tdvp::TDVPProblem) = tdvp.operator
-current_time(tdvp::TDVPProblem) = tdvp.current_time
+state(tdvp::ApplyExpProblem) = tdvp.state
+operator(tdvp::ApplyExpProblem) = tdvp.operator
+current_time(tdvp::ApplyExpProblem) = tdvp.current_time
 
 function set!(
-  T::TDVPProblem; state=state(T), operator=operator(T), current_time=current_time(T)
+  T::ApplyExpProblem; state=state(T), operator=operator(T), current_time=current_time(T)
 )
   T.state = state
   T.operator = operator
   T.current_time = current_time
 end
 
-function region_plan(tdvp::TDVPProblem; nsites, time_step, sweep_kwargs...)
+function region_plan(tdvp::ApplyExpProblem; nsites, time_step, sweep_kwargs...)
   return tdvp_regions(state(tdvp), time_step; nsites, sweep_kwargs...)
 end
 
 function updater!(
-  T::TDVPProblem,
-  local_tensor,
+  T::ApplyExpProblem,
+  local_state,
   region_iterator;
+  nsites,
   time_step,
   solver=exponentiate_solver,
   outputlevel,
   kws...,
 )
-  local_tensor, info = solver(
-    ψ->optimal_map(operator(T), ψ), time_step, local_tensor; kws...
-  )
+  local_state, info = solver(x->optimal_map(operator(T), x), time_step, local_state; kws...)
+  if nsites==1
+    curr_reg = current_region(region_iterator)
+    next_reg = next_region(region_iterator)
+    if !isnothing(next_reg) && next_reg != curr_reg
+      seq = itn.edge_sequence_between_regions(state(T), curr_reg, next_reg)
+      next_edge = first(seq)
+      v1, v2 = itn.src(next_edge), itn.dst(next_edge)
+      psi = copy(state(T))
+      psi[v1], R = qr(local_state, uniqueinds(local_state, psi[v2]))
+      shifted_operator = itn.position(operator(T), psi, itn.NamedEdge(v1=>v2))
+      R_t, _ = solver(x->optimal_map(shifted_operator, x), -time_step, R; kws...)
+      local_state = psi[v1]*R_t
+    end
+  end
+
   if is_last_region(region_iterator)
     T.current_time += 2*abs(time_step)  # currently assuming second-order method
     if outputlevel >= 2
       @printf("  Current time = %s\n", current_time(T))
     end
   end
-  return local_tensor
+  return local_state
 end
 
 function applyexp(
@@ -49,7 +63,7 @@ function applyexp(
   exponents;
   extracter_kwargs=(;),
   updater_kwargs=(;),
-  truncation_kwargs=(;),
+  inserter_kwargs=(;),
   outputlevel=0,
   nsites=1,
   subspace_kwargs=(;),
@@ -57,12 +71,7 @@ function applyexp(
 )
   time_steps = diff([0.0, exponents...])[2:end]
   sweep_kws = (;
-    outputlevel,
-    extracter_kwargs,
-    truncation_kwargs,
-    nsites,
-    subspace_kwargs,
-    updater_kwargs,
+    outputlevel, extracter_kwargs, inserter_kwargs, nsites, subspace_kwargs, updater_kwargs
   )
   kws_array = [(; sweep_kws..., time_step=t) for t in time_steps]
   sweep_iter = sweep_iterator(init_prob, kws_array)
@@ -71,7 +80,7 @@ function applyexp(
 end
 
 function applyexp(H, init_state, exponents; kws...)
-  init_prob = TDVPProblem(;
+  init_prob = ApplyExpProblem(;
     state=permute_indices(init_state), operator=itn.ProjTTN(permute_indices(H))
   )
   return applyexp(init_prob, exponents; kws...)

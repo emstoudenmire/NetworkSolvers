@@ -1,24 +1,15 @@
 
-function tdvp_regions(graph, time_step; updater_kwargs, kws...)
-  basic_fwd_sweep = post_order_dfs_plan(graph; kws...)
+function tdvp_regions(graph, time_step; updater_kwargs, nsites=1, kws...)
+  basic_fwd_sweep = post_order_dfs_plan(graph; nsites, kws...)
 
-  fwd_update = (; time_step=(+time_step/2), updater_kwargs...)
-  rev_update = (; time_step=(-time_step/2), updater_kwargs...)
+  updater_kwargs = (; nsites, time_step=(time_step/2), updater_kwargs...)
 
   fwd_sweep = []
   for (j, (region, region_kws)) in enumerate(basic_fwd_sweep)
-    push!(fwd_sweep, (region, (; updater_kwargs=fwd_update, region_kws...)))
-    # Put in reverse step except at end of forward sweep
-    if j < length(basic_fwd_sweep)
-      if length(region) == 1
-        next_region = first(basic_fwd_sweep[j + 1])
-        rev_region = NamedEdge(only(region), only(next_region))
-      elseif length(region) == 2
-        rev_region = [last(region)]
-      else
-        error("TDVP currently does not support regions of length = $(length(region))")
-      end
-      push!(fwd_sweep, (rev_region, (; updater_kwargs=rev_update, region_kws...)))
+    push!(fwd_sweep, (region, (; nsites, updater_kwargs, region_kws...)))
+    if length(region) == 2 && j < length(basic_fwd_sweep)
+      rev_kwargs = (; updater_kwargs..., time_step=(-updater_kwargs.time_step))
+      push!(fwd_sweep, ([last(region)], (; updater_kwargs=rev_kwargs, region_kws...)))
     end
   end
 

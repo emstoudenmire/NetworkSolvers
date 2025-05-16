@@ -52,10 +52,8 @@ end
 # Functions associated with RegionIterator
 #
 
-function region_iterator(problem; nsites=1, sweep_kwargs...)
-  return RegionIterator(;
-    problem, region_plan=region_plan(problem; nsites, sweep_kwargs...)
-  )
+function region_iterator(problem; sweep_kwargs...)
+  return RegionIterator(; problem, region_plan=region_plan(problem; sweep_kwargs...))
 end
 
 function region_iterator_action!(
@@ -64,24 +62,18 @@ function region_iterator_action!(
   extracter_kwargs=(;),
   subspace_kwargs=(;),
   updater_kwargs=(;),
-  truncation_kwargs=(;),
+  inserter_kwargs=(;),
   sweep,
   kwargs...,
 )
-  local_tensor = extracter!(problem, region_iterator; extracter_kwargs..., kwargs...)
-  local_tensor = prepare_subspace!(
-    problem,
-    local_tensor,
-    region_iterator;
-    subspace_kwargs...,
-    truncation_kwargs...,
-    sweep,
-    kwargs...,
+  local_state = extracter!(problem, region_iterator; extracter_kwargs..., kwargs...)
+  local_state = prepare_subspace!(
+    problem, local_state, region_iterator; subspace_kwargs..., sweep, kwargs...
   )
-  local_tensor = updater!(
-    problem, local_tensor, region_iterator; updater_kwargs..., kwargs...
+  local_state = updater!(
+    problem, local_state, region_iterator; updater_kwargs..., kwargs...
   )
-  inserter!(problem, local_tensor, region_iterator; sweep, truncation_kwargs..., kwargs...)
+  inserter!(problem, local_state, region_iterator; sweep, inserter_kwargs..., kwargs...)
   return nothing
 end
 
