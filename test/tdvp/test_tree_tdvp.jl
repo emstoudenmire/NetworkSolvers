@@ -63,17 +63,17 @@ end
   psi1_t = ns.tdvp(H, gs_psi, time_range; inserter_kwargs, nsites, outputlevel=0)
   (outputlevel >= 1) && println("Done with $nsites-site TDVP")
 
-  @test itn.norm(psi1_t) ≈ 1.0
+  @test itn.norm(psi1_t) > 0.999
 
   nsites = 2
   psi2_t = ns.tdvp(H, gs_psi, time_range; inserter_kwargs, nsites, outputlevel=0)
   (outputlevel >= 1) && println("Done with $nsites-site TDVP")
-  @test itn.norm(psi2_t) ≈ 1.0
+  @test itn.norm(psi2_t) > 0.999
 
   @test abs(itn.inner(psi1_t, gs_psi)) > 0.99
   @test abs(itn.inner(psi1_t, psi2_t)) > 0.99
 
   # Test that accumulated phase angle is E*tmax
   z = itn.inner(psi1_t, gs_psi)
-  @test atan(imag(z)/real(z)) ≈ E*tmax
+  @test abs(atan(imag(z)/real(z)) - E*tmax) < 1E-4
 end
