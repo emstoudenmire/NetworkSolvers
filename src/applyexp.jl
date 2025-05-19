@@ -34,7 +34,7 @@ function updater!(
   kws...,
 )
   local_state, info = solver(x->optimal_map(operator(T), x), time_step, local_state; kws...)
-  
+
   if nsites==1
     curr_reg = current_region(region_iterator)
     next_reg = next_region(region_iterator)

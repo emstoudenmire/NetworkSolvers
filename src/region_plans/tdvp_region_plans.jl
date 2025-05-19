@@ -5,7 +5,7 @@ function tdvp_sub_time_steps(tdvp_order)
     return [1 / 2, 1 / 2]
   elseif tdvp_order == 4
     s = (2 - 2^(1 / 3))^(-1)
-    return [s / 2, s / 2, (1 - 2 * s) / 2, (1 - 2 * s) / 2, s / 2, s / 2]
+    return [s/2, s/2, 1/2 - s, 1/2 - s, s/2, s/2]
   else
     error("TDVP order of $tdvp_order not supported")
   end
