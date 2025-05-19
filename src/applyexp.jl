@@ -29,11 +29,12 @@ function updater!(
   region_iterator;
   nsites,
   time_step,
-  solver=exponentiate_solver,
+  solver=runge_kutta_solver,
   outputlevel,
   kws...,
 )
   local_state, info = solver(x->optimal_map(operator(T), x), time_step, local_state; kws...)
+  
   if nsites==1
     curr_reg = current_region(region_iterator)
     next_reg = next_region(region_iterator)
@@ -50,9 +51,13 @@ function updater!(
   end
 
   if is_last_region(region_iterator)
+    # TODO: move this to a new "applyexp_sweep_printer" function
     T.current_time += 2*abs(time_step)  # currently assuming second-order method
-    if outputlevel >= 2
-      @printf("  Current time = %s\n", current_time(T))
+    if outputlevel >= 1
+      @printf("  Current time = %s, ", current_time(T))
+      @printf("maxlinkdim=%d", itn.maxlinkdim(state(T)))
+      println()
+      flush(stdout)
     end
   end
   return local_state

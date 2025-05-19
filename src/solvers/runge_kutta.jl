@@ -13,7 +13,7 @@ function runge_kutta_4(H, t, ψ0)
   return ψ0 + (t / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 end
 
-function runge_kutta_solver(H, time, ψ; order=nothing, kws...)
+function runge_kutta_solver(H, time, ψ; order=4, kws...)
   if order == 4
     Hψ = runge_kutta_4(H, time, ψ)
   elseif order == 2
