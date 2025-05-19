@@ -24,6 +24,9 @@ function tdvp(; N=10, total_time=1.0, time_step=0.1)
   nsites = 1
   inserter_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
   time_range = 0.0:time_step:total_time
+
+  # Using exponentiate solver
+  updater_kwargs = (; solver=ns.exponentiate_solver)
   res_1site = ns.tdvp(H, psi0, time_range; nsites, inserter_kwargs, tdvp_order, outputlevel)
 
   # Using RK solver
