@@ -21,18 +21,17 @@ end
 
 function updater!(
   E::EigsolveProblem,
-  local_tensor,
+  local_state,
   region_iterator;
   outputlevel,
   solver=eigsolve_solver,
   kws...,
 )
-  E.eigenvalue, local_tensor = solver(ψ->optimal_map(operator(E), ψ), local_tensor; kws...)
-  #E.eigenvalue, local_tensor = solver(ψ->operator_map(operator(E),ψ), local_tensor; kws...)
+  E.eigenvalue, local_state = solver(ψ->optimal_map(operator(E), ψ), local_state; kws...)
   if outputlevel >= 2
     @printf("  Region %s: energy = %.12f\n", current_region(region_iterator), eigenvalue(E))
   end
-  return local_tensor
+  return local_state
 end
 
 function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
@@ -57,7 +56,7 @@ function eigsolve(
   outputlevel=0,
   extracter_kwargs=(;),
   updater_kwargs=(;),
-  truncation_kwargs=(;),
+  inserter_kwargs=(;),
   subspace_kwargs=(; algorithm="densitymatrix"),
   sweep_printer=eigsolve_sweep_printer,
   kws...,
@@ -69,7 +68,7 @@ function eigsolve(
     outputlevel,
     extracter_kwargs,
     updater_kwargs,
-    truncation_kwargs,
+    inserter_kwargs,
     subspace_kwargs,
   )
   prob = sweep_solve(sweep_iter; outputlevel, sweep_printer, kws...)

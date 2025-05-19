@@ -1,30 +1,44 @@
+function tdvp_sub_time_steps(tdvp_order)
+  if tdvp_order == 1
+    return [1.0]
+  elseif tdvp_order == 2
+    return [1 / 2, 1 / 2]
+  elseif tdvp_order == 4
+    s = (2 - 2^(1 / 3))^(-1)
+    return [s/2, s/2, 1/2 - s, 1/2 - s, s/2, s/2]
+  else
+    error("TDVP order of $tdvp_order not supported")
+  end
+end
 
-function tdvp_regions(graph, time_step; updater_kwargs, kws...)
-  basic_fwd_sweep = post_order_dfs_plan(graph; kws...)
-
-  fwd_update = (; time_step=(+time_step/2), updater_kwargs...)
-  rev_update = (; time_step=(-time_step/2), updater_kwargs...)
-
-  fwd_sweep = []
+function first_order_sweep(
+  graph, time_step, dir=Base.Forward; updater_kwargs, nsites, kws...
+)
+  basic_fwd_sweep = post_order_dfs_plan(graph; nsites, kws...)
+  updater_kwargs = (; nsites, time_step, updater_kwargs...)
+  sweep = []
   for (j, (region, region_kws)) in enumerate(basic_fwd_sweep)
-    push!(fwd_sweep, (region, (; updater_kwargs=fwd_update, region_kws...)))
-    # Put in reverse step except at end of forward sweep
-    if j < length(basic_fwd_sweep)
-      if length(region) == 1
-        next_region = first(basic_fwd_sweep[j + 1])
-        rev_region = NamedEdge(only(region), only(next_region))
-      elseif length(region) == 2
-        rev_region = [last(region)]
-      else
-        error("TDVP currently does not support regions of length = $(length(region))")
-      end
-      push!(fwd_sweep, (rev_region, (; updater_kwargs=rev_update, region_kws...)))
+    push!(sweep, (region, (; nsites, updater_kwargs, region_kws...)))
+    if length(region) == 2 && j < length(basic_fwd_sweep)
+      rev_kwargs = (; updater_kwargs..., time_step=(-updater_kwargs.time_step))
+      push!(sweep, ([last(region)], (; updater_kwargs=rev_kwargs, region_kws...)))
     end
   end
+  if dir==Base.Reverse
+    # Reverse regions as well as ordering of regions
+    sweep = [(reverse(reg_kws[1]), reg_kws[2]) for reg_kws in reverse(sweep)]
+  end
+  return sweep
+end
 
-  # Reverse regions as well as ordering of regions
-  rev_sweep = [(reverse(reg_kws[1]), reg_kws[2]) for reg_kws in reverse(fwd_sweep)]
-  sweep_plan = [fwd_sweep..., rev_sweep...]
-
+function tdvp_regions(graph, time_step; updater_kwargs, tdvp_order, nsites, kws...)
+  sweep_plan = []
+  for (step, weight) in enumerate(tdvp_sub_time_steps(tdvp_order))
+    dir = isodd(step) ? Base.Forward : Base.Reverse
+    append!(
+      sweep_plan,
+      first_order_sweep(graph, weight*time_step, dir; updater_kwargs, nsites, kws...),
+    )
+  end
   return sweep_plan
 end

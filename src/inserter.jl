@@ -17,21 +17,14 @@ function inserter!(
 
   region = current_region(region_iterator)
   psi = state(problem)
-  if region isa ng.NamedEdge
-    psi = state(problem)
-    #Is there a world in which this modifies the graph structure, if not preserve_graph also should be used here for efficiency
-    psi[Graphs.dst(region)] *= local_tensor
-    psi = itn.set_ortho_region(psi, [Graphs.dst(region)])
-    set!(problem; state=psi)
-    return nothing
+  if length(region) == 1
+    C = local_tensor
   elseif length(region) == 2
     e = ng.edgetype(psi)(first(region), last(region))
     indsTe = it.inds(psi[first(region)])
     tags = it.tags(psi, e)
     U, C, _ = it.factorize(local_tensor, indsTe; tags, maxdim, mindim, cutoff)
     itn.@preserve_graph psi[first(region)] = U
-  elseif length(region) == 1
-    C = local_tensor
   else
     error("Region of length $(length(region)) not currently supported")
   end

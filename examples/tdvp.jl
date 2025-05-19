@@ -19,21 +19,28 @@ function tdvp(; N=10, total_time=1.0, time_step=0.1)
   H = itn.mpo(os, s)
   psi0 = itn.random_mps(s; link_space=16)
 
+  tdvp_order = 4
   outputlevel = 0
   nsites = 1
-  truncation_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
+  inserter_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
   time_range = 0.0:time_step:total_time
-  res_1site = ns.tdvp(H, psi0, time_range; nsites, truncation_kwargs, outputlevel)
+
+  # Using exponentiate solver
+  updater_kwargs = (; solver=ns.exponentiate_solver)
+  res_1site = ns.tdvp(H, psi0, time_range; nsites, inserter_kwargs, tdvp_order, outputlevel)
 
   # Using RK solver
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
   res_rk4 = ns.tdvp(
-    H, psi0, 0.0:time_step:total_time; truncation_kwargs, updater_kwargs, outputlevel
+    H, psi0, 0.0:time_step:total_time; inserter_kwargs, updater_kwargs, outputlevel
   )
 
   # Using 2-site sweeping scheme
   nsites = 2
-  res_2site = ns.tdvp(H, psi0, time_range; nsites, truncation_kwargs, outputlevel)
+  updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
+  res_2site = ns.tdvp(
+    H, psi0, time_range; nsites, inserter_kwargs, updater_kwargs, outputlevel
+  )
 
   @show inner(res_1site, res_2site)
   @show inner(res_1site, res_rk4)
@@ -42,78 +49,85 @@ function tdvp(; N=10, total_time=1.0, time_step=0.1)
   return nothing
 end
 
-function test_tdvp(; N=6, total_time=0.1, time_step=0.01)
+function test_tdvp(; N=4, total_time=2E-3, time_step=5E-4, tdvp_order=4)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
   os = itm.OpSum()
   for j in 1:(N - 1)
     os += "Sz", j, "Sz", j + 1
-    os += 0.5, "S+", j, "S-", j + 1
-    os += 0.5, "S-", j, "S+", j + 1
+    os += 1/2, "S+", j, "S-", j + 1
+    os += 1/2, "S-", j, "S+", j + 1
   end
   H = itn.mpo(os, s)
-  psi = itn.random_mps(s; link_space=32)
+  psi0 = itn.random_mps(s; link_space=8)
+  psi0 = itn.truncate(psi0; cutoff=1E-12)
 
   time_range = 0.0:time_step:total_time
   nsweeps = length(time_range) - 1
-  szs = zeros(nsweeps, N)
-  function region_callback(problem; sweep, kws...)
-    return szs[sweep, :] = itn.expect(problem.state, "Sz")
+
+  szs_tdvp = zeros(nsweeps, N)
+  function sweep_callback(problem; sweep, kws...)
+    sz_t = real.(itn.expect(problem.state, "Sz"))
+    return szs_tdvp[sweep, :] = sz_t
   end
 
   outputlevel = 0
-  truncation_kwargs = (; maxdim=100, cutoff=1E-10)
-  updater_kwargs = (; solver=ns.runge_kutta_solver, order=2)
-  subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
-  #subspace_kwargs = (;)
-  res = ns.applyexp(
-    H,
-    psi,
-    time_range;
-    truncation_kwargs,
-    outputlevel,
-    region_callback,
-    subspace_kwargs,
-    updater_kwargs,
-  )
-  #@show norm(res)
+  inserter_kwargs = (; maxdim=40, cutoff=1E-10, normalize=true)
+  nsites = 2
 
+  #subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
+  subspace_kwargs = (;)
+
+  psi_tdvp = ns.tdvp(
+    H,
+    copy(psi0),
+    time_range;
+    nsites,
+    inserter_kwargs,
+    outputlevel,
+    sweep_callback,
+    subspace_kwargs,
+    tdvp_order,
+  )
   println("\nResult from TDVP:")
-  display(szs)
+  display(szs_tdvp)
+  @show itn.norm(psi_tdvp)
 
   #
   # Use ED to check
   #
-  H = prod(H)
-  psi = prod(psi)
-  expH = exp(H * (-im*time_step))
+  Hx = prod(H)
+  psix = prod(psi0)
+  psix /= norm(psix)
+  expHx = exp(Hx * (-im*time_step))
   szs_ed = zeros(nsweeps, N)
   for sweep in 1:nsweeps
-    psi = noprime(psi * expH)
+    psix = noprime(psix * expHx)
+    psix /= norm(psix)
     for j in 1:N
-      szs_ed[sweep, j] =
-        scalar(dag(prime(psi, s[j])) * itm.op("Sz", s[j]) * psi) / norm(psi)
+      szs_ed[sweep, j] = real(scalar(dag(prime(psix, s[j])) * itm.op("Sz", s[j]) * psix))
     end
   end
   println("\nResult from ED:")
   display(szs_ed)
-  #@show norm(psi)
+  @show norm(psix)
+  @show abs(scalar(dag(prod(psi_tdvp))*psix))
 
   println()
-  @show norm(szs_ed - szs)
+  @show norm(szs_ed - szs_tdvp)
 
   maxerr = 0.0
   err_point = nothing
-  for i in 1:size(szs, 1), j in 1:size(szs, 2)
-    err = norm(szs[i, j]-szs_ed[i, j])
+  for i in 1:size(szs_tdvp, 1), j in 1:size(szs_tdvp, 2)
+    err = norm(szs_tdvp[i, j]-szs_ed[i, j])
     if err > maxerr
       maxerr = err
       err_point = (i, j)
     end
   end
   @printf("Largest error (%.3E) at i,j=%d,%d\n", maxerr, err_point[1], err_point[2])
-  @printf("   TDVP value = %.10f\n", szs[err_point...])
+  @printf("   TDVP value = %.10f\n", szs_tdvp[err_point...])
   @printf("     ED value = %.10f\n", szs_ed[err_point...])
 
   return nothing
