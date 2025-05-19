@@ -88,12 +88,11 @@ function test_tdvp(; N=4, total_time=2E-3, time_step=5E-4, tdvp_order=4)
     outputlevel,
     sweep_callback,
     subspace_kwargs,
-    tdvp_order
+    tdvp_order,
   )
   println("\nResult from TDVP:")
   display(szs_tdvp)
   @show itn.norm(psi_tdvp)
-
 
   #
   # Use ED to check
