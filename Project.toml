@@ -17,8 +17,8 @@ TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
 
 [compat]
 Graphs = "1.12.0"
-ITensorNetworks = "0.13.9"
-ITensors = "0.9"
+ITensorNetworks = "0.11, 0.12, 0.13"
+ITensors = "0.7, 0.8, 0.9"
 IterTools = "1.10.0"
 KrylovKit = "0.6, 0.7, 0.8"
 NamedGraphs = "0.6.8"
