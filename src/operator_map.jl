@@ -1,5 +1,4 @@
 import ITensorNetworks as itn
-using TensorOperations: TensorOperations
 
 function optimal_map(P::itn.ProjTTN, ψ)
   envs = [itn.environment(P, e) for e in itn.incident_edges(P)]
