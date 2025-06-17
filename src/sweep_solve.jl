@@ -18,10 +18,9 @@ function sweep_solve(
   kwargs...,
 )
   for (sweep, region_iter) in enumerate(sweep_iterator)
-    prob = problem(region_iter)
     for (region, region_kwargs) in region_tuples(region_iter)
       region_callback(
-        prob;
+        problem(region_iter);
         nsweeps=length(sweep_iterator),
         outputlevel,
         region,
@@ -30,8 +29,12 @@ function sweep_solve(
         kwargs...,
       )
     end
-    sweep_callback(prob; nsweeps=length(sweep_iterator), outputlevel, sweep, kwargs...)
-    sweep_printer(prob; nsweeps=length(sweep_iterator), outputlevel, sweep, kwargs...)
+    sweep_callback(
+      problem(region_iter); nsweeps=length(sweep_iterator), outputlevel, sweep, kwargs...
+    )
+    sweep_printer(
+      problem(region_iter); nsweeps=length(sweep_iterator), outputlevel, sweep, kwargs...
+    )
   end
   return problem(last(sweep_iterator))
 end

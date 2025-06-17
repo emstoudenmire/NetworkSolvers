@@ -11,15 +11,7 @@ eigenvalue(E::EigsolveProblem) = E.eigenvalue
 state(E::EigsolveProblem) = E.state
 operator(E::EigsolveProblem) = E.operator
 
-function set!(
-  E::EigsolveProblem; state=E.state, operator=E.operator, eigenvalue=E.eigenvalue
-)
-  E.state = state
-  E.operator = operator
-  E.eigenvalue = eigenvalue
-end
-
-function updater!(
+function updater(
   E::EigsolveProblem,
   local_state,
   region_iterator;
@@ -27,11 +19,12 @@ function updater!(
   solver=eigsolve_solver,
   kws...,
 )
-  E.eigenvalue, local_state = solver(ψ->optimal_map(operator(E), ψ), local_state; kws...)
+  eigval, local_state = solver(ψ->optimal_map(operator(E), ψ), local_state; kws...)
+  E = setproperties(E; eigenvalue=eigval)
   if outputlevel >= 2
     @printf("  Region %s: energy = %.12f\n", current_region(region_iterator), eigenvalue(E))
   end
-  return local_state
+  return E, local_state
 end
 
 function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
