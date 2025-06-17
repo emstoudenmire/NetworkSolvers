@@ -1,7 +1,7 @@
 module NetworkSolvers
 
-import TensorOperations # <-- to avoid a warning when
-                        # loading ITensorNetworks
+using TensorOperations: TensorOperations # <-- to avoid a warning when
+# loading ITensorNetworks
 
 # Core solvers and linear algebra
 include("solvers/eigsolve.jl")

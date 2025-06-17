@@ -22,20 +22,7 @@ function ket(F::FittingProblem)
   return first(itn.induced_subgraph(itn.tensornetwork(state(F)), ket_vertices))
 end
 
-function set!(
-  F::FittingProblem;
-  ket_graph=ket_graph(F),
-  state=state(F),
-  gauge_region=gauge_region(F),
-  overlap=overlap(F),
-)
-  F.ket_graph = ket_graph
-  F.state = state
-  F.overlap = overlap
-  F.gauge_region = gauge_region
-end
-
-function extracter!(problem::FittingProblem, region_iterator; kws...)
+function extracter(problem::FittingProblem, region_iterator; kws...)
   region = current_region(region_iterator)
   prev_region = gauge_region(problem)
   tn = state(problem)
@@ -45,27 +32,23 @@ function extracter!(problem::FittingProblem, region_iterator; kws...)
   tn = itn.update(
     itn.Algorithm("bp"), tn, pe_path; message_update_function_kwargs=(; normalize=false)
   )
-  set!(problem; state=tn, gauge_region=region)
-
   local_tensor = itn.environment(tn, region)
   sequence = itn.contraction_sequence(local_tensor; alg="optimal")
   local_tensor = dag(it.contract(local_tensor; sequence))
-
-  return local_tensor
+  return setproperties(problem; state=tn, gauge_region=region), local_tensor
 end
 
-function prepare_subspace!(problem::FittingProblem, local_tensor, region; sweep, kws...)
-  local_tensor = subspace_expand!(problem, local_tensor, region; sweep, kws...)
-  return local_tensor
+function prepare_subspace(problem::FittingProblem, local_tensor, region; sweep, kws...)
+  return subspace_expand(problem, local_tensor, region; sweep, kws...)
 end
 
-function updater!(F::FittingProblem, local_tensor, region; outputlevel, kws...)
+function updater(F::FittingProblem, local_tensor, region; outputlevel, kws...)
   n = (local_tensor * dag(local_tensor))[]
-  F.overlap = n / sqrt(n)
+  F = setproperties(F; overlap=n / sqrt(n))
   if outputlevel >= 2
     @printf("  Region %s: squared overlap = %.12f\n", region, overlap(F))
   end
-  return local_tensor
+  return F, local_tensor
 end
 
 function region_plan(F::FittingProblem; nsites, sweep_kwargs...)

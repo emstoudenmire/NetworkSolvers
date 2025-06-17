@@ -1,6 +1,6 @@
 import ITensorNetworks as itn
 
-function subspace_expand!(
+function subspace_expand(
   ::Backend"densitymatrix",
   problem,
   local_state::ITensor,
@@ -17,23 +17,23 @@ function subspace_expand!(
   psi = state(problem)
 
   prev_vertex_set = setdiff(itn.pos(operator(problem)), region)
-  (length(prev_vertex_set) != 1) && return local_state
+  (length(prev_vertex_set) != 1) && return problem, local_state
   prev_vertex = only(prev_vertex_set)
   A = psi[prev_vertex]
 
   next_vertices = filter(v -> (it.hascommoninds(psi[v], A)), region)
-  isempty(next_vertices) && return local_state
+  isempty(next_vertices) && return problem, local_state
   next_vertex = only(next_vertices)
   C = psi[next_vertex]
 
   a = commonind(A, C)
-  isnothing(a) && return local_state
+  isnothing(a) && return problem, local_state
   basis_size = prod(dim.(uniqueinds(A, C)))
 
   expand_maxdim = compute_expansion(
     dim(a), basis_size; expansion_factor, max_expand, maxdim
   )
-  expand_maxdim <= 0 && return local_state
+  expand_maxdim <= 0 && return problem, local_state
 
   envs = itn.environments(operator(problem))
   H = itn.operator(operator(problem))
@@ -57,7 +57,7 @@ function subspace_expand!(
   end
   if norm(dag(U)*A) > 1E-10
     @printf("Warning: |U*A| = %.3E in subspace expansion\n", norm(dag(U)*A))
-    return local_state
+    return problem, local_state
   end
 
   Ax, ax = directsum(A=>a, U=>commonind(U, D))
@@ -70,5 +70,5 @@ function subspace_expand!(
   psi[next_vertex] = expander * C
   local_state = expander*local_state
 
-  return local_state
+  return problem, local_state
 end

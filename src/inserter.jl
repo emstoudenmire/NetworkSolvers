@@ -1,5 +1,6 @@
+import ConstructionBase: setproperties
 
-function inserter!(
+function inserter(
   problem,
   local_tensor,
   region_iterator;
@@ -32,6 +33,5 @@ function inserter!(
   itn.@preserve_graph psi[v] = C
   psi = set_orthogonal_region ? itn.set_ortho_region(psi, [v]) : psi
   normalize && itn.@preserve_graph psi[v] = psi[v] / norm(psi[v])
-  set!(problem; state=psi)
-  return nothing
+  return setproperties(problem; state=psi)
 end

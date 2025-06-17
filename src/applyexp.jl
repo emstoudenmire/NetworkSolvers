@@ -11,19 +11,11 @@ state(tdvp::ApplyExpProblem) = tdvp.state
 operator(tdvp::ApplyExpProblem) = tdvp.operator
 current_time(tdvp::ApplyExpProblem) = tdvp.current_time
 
-function set!(
-  T::ApplyExpProblem; state=state(T), operator=operator(T), current_time=current_time(T)
-)
-  T.state = state
-  T.operator = operator
-  T.current_time = current_time
-end
-
 function region_plan(tdvp::ApplyExpProblem; nsites, time_step, sweep_kwargs...)
   return tdvp_regions(state(tdvp), time_step; nsites, sweep_kwargs...)
 end
 
-function updater!(
+function updater(
   T::ApplyExpProblem,
   local_state,
   region_iterator;
@@ -51,8 +43,9 @@ function updater!(
   end
 
   if is_last_region(region_iterator)
+    curr_time = current_time(T) + 2*abs(time_step)  # currently assuming second-order method
+    T = setproperties(T; current_time=curr_time)
     # TODO: move this to a new "applyexp_sweep_printer" function
-    T.current_time += 2*abs(time_step)  # currently assuming second-order method
     if outputlevel >= 1
       @printf("  Current time = %s, ", current_time(T))
       @printf("maxlinkdim=%d", itn.maxlinkdim(state(T)))
@@ -60,7 +53,7 @@ function updater!(
       flush(stdout)
     end
   end
-  return local_state
+  return T, local_state
 end
 
 function applyexp(

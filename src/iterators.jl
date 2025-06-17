@@ -44,7 +44,7 @@ function Base.iterate(R::RegionIterator, which=1)
   region_plan_state = iterate(R.region_plan, which)
   isnothing(region_plan_state) && return nothing
   (current_region, region_kwargs), next = region_plan_state
-  region_iterator_action!(problem(R), R; region_kwargs...)
+  R.problem = region_iterator_action(problem(R), R; region_kwargs...)
   return R, next
 end
 
@@ -56,7 +56,7 @@ function region_iterator(problem; sweep_kwargs...)
   return RegionIterator(; problem, region_plan=region_plan(problem; sweep_kwargs...))
 end
 
-function region_iterator_action!(
+function region_iterator_action(
   problem,
   region_iterator;
   extracter_kwargs=(;),
@@ -66,15 +66,17 @@ function region_iterator_action!(
   sweep,
   kwargs...,
 )
-  local_state = extracter!(problem, region_iterator; extracter_kwargs..., kwargs...)
-  local_state = prepare_subspace!(
+  problem, local_state = extracter(problem, region_iterator; extracter_kwargs..., kwargs...)
+  problem, local_state = prepare_subspace(
     problem, local_state, region_iterator; subspace_kwargs..., sweep, kwargs...
   )
-  local_state = updater!(
+  problem, local_state = updater(
     problem, local_state, region_iterator; updater_kwargs..., kwargs...
   )
-  inserter!(problem, local_state, region_iterator; sweep, inserter_kwargs..., kwargs...)
-  return nothing
+  problem = inserter(
+    problem, local_state, region_iterator; sweep, inserter_kwargs..., kwargs...
+  )
+  return problem
 end
 
 function region_plan(problem; nsites, sweep_kwargs...)
