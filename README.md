@@ -13,13 +13,14 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 ## To Do List
 
 - General improvements:
-    - [ ] Merge subspace expansion etc. back into extracter!
     - [ ] Have subspace expansion expand all 'previous' bonds
     - [ ] Test maxdim cap can be set separately in subspace expansion
-    - [ ] Replace use of ProjTTN with BP cache (in eigsolve and applyexp)
-    - [ ] Make root vertex be 1 for MPS / path_graph?
+          --> actually make it a differently-named keyword argument
     - [ ] Should 'nsites' keyword be put into something like extracter/updater/inserter kwargs or is 
           it more "global". Can it be left out and just inferred from region sizes?
+    - [ ] Make root vertex be 1 for MPS / path_graph?
+    - [ ] Replace use of ProjTTN with BP cache (in eigsolve and applyexp)
+    - [X] Merge subspace expansion etc. back into extracter!
     - [X] Use ConstructionBase.jl and `setproperties` as alternative to `set!` functions
     - [X] replace calls like `tn[v] = T` with `set_index_preservegraph!`
     - [X] Split subspace arguments like maxdim back into subspace_kwargs, not using truncation_kwargs.
