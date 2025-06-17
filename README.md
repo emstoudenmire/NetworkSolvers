@@ -12,12 +12,16 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
-- Misc. improvements:
+- General improvements:
+    - [ ] Use ConstructionBase.jl and `setproperties` as alternative to `set!` functions
+    - [ ] Replace use of ProjTTN with BP cache (in eigsolve and applyexp)
+    - [ ] Merge subspace expansion etc. back into extracter!
+    - [ ] Have subspace expansion expand all 'previous' bonds
     - [ ] Test maxdim cap can be set separately in subspace expansion
     - [ ] Make root vertex be 1 for MPS / path_graph?
     - [ ] Should 'nsites' keyword be put into something like extracter/updater/inserter kwargs or is 
           it more "global". Can it be left out and just inferred from region sizes?
-    - [ ] replace calls like `tn[v] = T` with `set_index_preservegraph!`
+    - [X] replace calls like `tn[v] = T` with `set_index_preservegraph!`
     - [X] Split subspace arguments like maxdim back into subspace_kwargs, not using truncation_kwargs.
           Rename truncation_kwargs back to inserter_kwargs.
     - [X] Reconceptualize local_tensor as local_state, which might be a collection of tensors, etc.
@@ -27,6 +31,8 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
   - [ ] Test quench with 2-site TDVP + subspace
 
 - One-site TDVP redesign:
+  - [ ] Fix one-site graph logic to determine next bond as related to the final region, not to
+        the next region
   - [ ] Fix inserter in 1-site TDVP to apply truncation.
   - [X] Do one-site TDVP in a 2-site "style", just updating the left and bond tensor and not touching
         the 'right' tensor except possibly during the inserter step.
