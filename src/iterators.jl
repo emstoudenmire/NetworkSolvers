@@ -66,9 +66,8 @@ function region_iterator_action(
   sweep,
   kwargs...,
 )
-  problem, local_state = extracter(problem, region_iterator; extracter_kwargs..., kwargs...)
-  problem, local_state = prepare_subspace(
-    problem, local_state, region_iterator; subspace_kwargs..., sweep, kwargs...
+  problem, local_state = extracter(
+    problem, region_iterator; extracter_kwargs..., sweep, kwargs...
   )
   problem, local_state = updater(
     problem, local_state, region_iterator; updater_kwargs..., kwargs...

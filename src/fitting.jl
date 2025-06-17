@@ -22,7 +22,7 @@ function ket(F::FittingProblem)
   return first(itn.induced_subgraph(itn.tensornetwork(state(F)), ket_vertices))
 end
 
-function extracter(problem::FittingProblem, region_iterator; kws...)
+function extracter(problem::FittingProblem, region_iterator; sweep, kws...)
   region = current_region(region_iterator)
   prev_region = gauge_region(problem)
   tn = state(problem)
@@ -35,11 +35,8 @@ function extracter(problem::FittingProblem, region_iterator; kws...)
   local_tensor = itn.environment(tn, region)
   sequence = itn.contraction_sequence(local_tensor; alg="optimal")
   local_tensor = dag(it.contract(local_tensor; sequence))
+  problem, local_tensor = subspace_expand(problem, local_tensor, region; sweep, kws...)
   return setproperties(problem; state=tn, gauge_region=region), local_tensor
-end
-
-function prepare_subspace(problem::FittingProblem, local_tensor, region; sweep, kws...)
-  return subspace_expand(problem, local_tensor, region; sweep, kws...)
 end
 
 function updater(F::FittingProblem, local_tensor, region; outputlevel, kws...)

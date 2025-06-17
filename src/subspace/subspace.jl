@@ -5,28 +5,6 @@ import ConstructionBase: setproperties
 default_expansion_factor() = 1.5
 default_max_expand() = 4
 
-function prepare_subspace(problem, local_state, region_iterator; sweep, kws...)
-  problem, local_state = subspace_expand(
-    problem, local_state, region_iterator; sweep, kws...
-  )
-  shifted_operator = itn.position(
-    operator(problem), state(problem), current_region(region_iterator)
-  )
-  return setproperties(problem; operator=shifted_operator), local_state
-end
-
-function subspace_expand(backend, problem, local_state, region_iterator; kws...)
-  error(
-    "Subspace expansion (subspace_expand!) not defined for requested combination of algorithm and problem types",
-  )
-end
-
-function subspace_expand(
-  backend::Backend{:nothing}, problem, local_state, region_iterator; kws...
-)
-  problem, local_state
-end
-
 function subspace_expand(
   problem,
   local_state,
@@ -51,6 +29,18 @@ function subspace_expand(
     maxdim,
     kws...,
   )
+end
+
+function subspace_expand(backend, problem, local_state, region_iterator; kws...)
+  error(
+    "Subspace expansion (subspace_expand!) not defined for requested combination of algorithm and problem types",
+  )
+end
+
+function subspace_expand(
+  backend::Backend{:nothing}, problem, local_state, region_iterator; kws...
+)
+  problem, local_state
 end
 
 function compute_expansion(
