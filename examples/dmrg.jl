@@ -23,17 +23,16 @@ function dmrg(; N=10, nsites=2, site_type="S=1", conserve_qns=false)
   end
   psi = itn.ttn(state, s)
 
-  nsweeps = 5
-  cutoff = 1E-9
+  nsweeps = 8
+  cutoff = 1E-12
   maxdim = [10, 40, 80, 160]
   outputlevel = 1
-  truncation_kwargs = (; cutoff, maxdim)
-  #subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
-  subspace_kwargs = (;)
+  subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
+  inserter_kwargs = (; cutoff, maxdim)
 
   @time begin
     energy, gs_psi = ns.dmrg(
-      H, psi; nsweeps, nsites, truncation_kwargs, subspace_kwargs, outputlevel
+      H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel
     )
   end
   println("Final energy = ", energy)
@@ -65,10 +64,10 @@ function tree_dmrg(; conserve_qns=false)
   cutoff = 1E-9
   maxdim = 20
   outputlevel = 2
-  truncation_kwargs = (; cutoff, maxdim)
+  inserter_kwargs = (; cutoff, maxdim)
   subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
   energy, gs_psi = ns.dmrg(
-    H, psi; nsweeps, nsites, truncation_kwargs, subspace_kwargs, outputlevel
+    H, psi; nsweeps, nsites, inserter_kwargs, subspace_kwargs, outputlevel
   )
   return println("Final energy = ", energy)
 end
