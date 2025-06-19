@@ -12,6 +12,14 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 ## To Do List
 
+- PR punchlist:
+  - [ ] Have subspace expansion expand all 'previous' bonds
+  - [ ] Keyword argument improvements:
+        - [ ] Separate maxdim keyword for subspace_expand
+        - [ ] How is nsweeps handled?
+        - [ ] Are kw tuples completely separate / orthogonal?
+              (e.g. do any actions rely on other actions kwargs?)
+
 - General improvements:
     - [ ] Have subspace expansion expand all 'previous' bonds
     - [ ] Test maxdim cap can be set separately in subspace expansion
