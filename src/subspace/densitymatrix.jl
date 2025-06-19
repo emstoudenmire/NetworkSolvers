@@ -1,4 +1,6 @@
+import ITensors as it
 import ITensorNetworks as itn
+using NamedGraphs.GraphsExtensions: incident_edges
 
 function subspace_expand(
   ::Backend"densitymatrix",
@@ -70,5 +72,5 @@ function subspace_expand(
   psi[next_vertex] = expander * C
   local_state = expander*local_state
 
-  return problem, local_state
+  return setproperties(problem; state=psi), local_state
 end
