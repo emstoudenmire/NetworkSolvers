@@ -13,6 +13,8 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 ## To Do List
 
 - PR punchlist:
+  - [ ] Fix DMRG bug (& test TDVP etc.)
+        A previous working commit was 4742bb2e1dba
   - [ ] Have subspace expansion expand all 'previous' bonds
   - [ ] Keyword argument improvements:
         - [ ] Separate maxdim keyword for subspace_expand
