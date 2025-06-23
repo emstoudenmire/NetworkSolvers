@@ -76,7 +76,7 @@ function test_tdvp(; N=4, total_time=2E-3, time_step=5E-4, tdvp_order=4)
   inserter_kwargs = (; maxdim=40, cutoff=1E-10, normalize=true)
   nsites = 2
 
-  #subspace_kwargs = (; algorithm="densitymatrix", maxdim=4)
+  #subspace_kwargs = (; algorithm="densitymatrix", max_expand=4)
   subspace_kwargs = (;)
 
   psi_tdvp = ns.tdvp(

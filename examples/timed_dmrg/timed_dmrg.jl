@@ -30,7 +30,7 @@ function main(; N=100, nsites=2, site_type="S=1", conserve_qns=false)
   maxdim = [10, 40, 80, 160]
   outputlevel = 1
   truncation_kwargs = (; cutoff, maxdim)
-  subspace_kwargs = (;) #(; algorithm="densitymatrix", maxdim=4)
+  subspace_kwargs = (;) #(; algorithm="densitymatrix", max_expand=4)
 
   @time begin
     energy, gs_psi = timed_dmrg(

@@ -32,10 +32,10 @@ function subspace_expand(
   isnothing(a) && return problem, local_state
   basis_size = prod(dim.(uniqueinds(A, C)))
 
-  expand_maxdim = compute_expansion(
+  expanded_maxdim = compute_expansion(
     dim(a), basis_size; expansion_factor, max_expand, maxdim
   )
-  expand_maxdim <= 0 && return problem, local_state
+  expanded_maxdim <= 0 && return problem, local_state
 
   envs = itn.environments(operator(problem))
   H = itn.operator(operator(problem))
@@ -51,7 +51,11 @@ function subspace_expand(
     sqrt_rho = conj_proj_A(sqrt_rho)
   end
   rho = sqrt_rho * dag(noprime(sqrt_rho))
-  D, U = eigen(rho; cutoff, maxdim=expand_maxdim, mindim, ishermitian=true)
+  #println("Performing densitymatrix subspace expansion")
+  #println("maxdim keyword set to ",maxdim)
+  #println("max_expand keyword set to ",max_expand)
+  #@printf("Calling eigen with: maxdim=expanded_maxdim=%d, mindim=%d, cutoff=%.3E\n",expanded_maxdim,mindim,cutoff)
+  D, U = eigen(rho; cutoff, maxdim=expanded_maxdim, mindim, ishermitian=true)
 
   Uproj(T) = (T - prime(A, a)*(dag(prime(A, a))*T))
   for pass in 1:north_pass
@@ -63,7 +67,6 @@ function subspace_expand(
   end
 
   Ax, ax = directsum(A=>a, U=>commonind(U, D))
-  #println("Performing densitymatrix subspace expansion")
   #println("Old space: ", space(a))
   #println("New space: ", space(ax))
   #ITensors.pause()

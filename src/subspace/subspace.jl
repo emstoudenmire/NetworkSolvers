@@ -50,9 +50,17 @@ function compute_expansion(
   max_expand=default_max_expand(),
   maxdim=default_maxdim(),
 )
+  # Note: expand_maxdim will be *added* to current bond dimension
+  # Obtain expand_maxdim from expansion_factor
   expand_maxdim = ceil(Int, expansion_factor * current_dim)
+  # Enforce max_expand keyword
+  expand_maxdim = min(max_expand, expand_maxdim)
+
+  # Restrict expand_maxdim below theoretical upper limit
   expand_maxdim = min(basis_size-current_dim, expand_maxdim)
+  # Enforce total maxdim setting (e.g. used in inserter step)
   expand_maxdim = min(maxdim-current_dim, expand_maxdim)
+  # Ensure expand_maxdim is non-negative
   expand_maxdim = max(0, expand_maxdim)
   return expand_maxdim
 end
