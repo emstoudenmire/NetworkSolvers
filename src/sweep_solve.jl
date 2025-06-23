@@ -36,5 +36,5 @@ function sweep_solve(
       problem(region_iter); nsweeps=length(sweep_iterator), outputlevel, sweep, kwargs...
     )
   end
-  return problem(last(sweep_iterator))
+  return problem(sweep_iterator)
 end

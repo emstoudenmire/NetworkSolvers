@@ -1,21 +1,43 @@
+#
+# SweepIterator
+#
 
-#
-# sweep_iterator
-#
+mutable struct SweepIterator
+  sweep_kws
+  region_iter
+  which_sweep::Int
+end
+
+problem(S::SweepIterator) = problem(S.region_iter)
+
+Base.length(S::SweepIterator) = length(S.sweep_kws)
+
+function Base.iterate(S::SweepIterator, which=nothing)
+  if isnothing(which)
+    sweep_kws_state = iterate(S.sweep_kws)
+  else
+    sweep_kws_state = iterate(S.sweep_kws, which)
+  end
+  isnothing(sweep_kws_state) && return nothing
+  current_sweep_kws, next = sweep_kws_state
+
+  if !isnothing(which)
+    S.region_iter = region_iterator(
+      problem(S.region_iter); sweep=S.which_sweep, current_sweep_kws...
+    )
+  end
+  S.which_sweep += 1
+  return S.region_iter, next
+end
 
 function sweep_iterator(problem, sweep_kws)
-  return [region_iterator(problem; sweep=s, kws...) for (s, kws) in enumerate(sweep_kws)]
+  region_iter = region_iterator(problem; sweep=1, first(sweep_kws)...)
+  return SweepIterator(sweep_kws, region_iter, 1)
 end
 
 function sweep_iterator(problem, nsweeps::Integer; sweep_kws...)
   return sweep_iterator(problem, Iterators.repeated(sweep_kws, nsweeps))
 end
-
-#
-# step_iterator
-#
-
-step_iterator(args...; kws...) = Iterators.flatten(sweep_iterator(args...; kws...))
 
 #
 # RegionIterator
