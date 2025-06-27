@@ -29,7 +29,8 @@ function main(; N=100, nsites=2, site_type="S=1", conserve_qns=false)
   cutoff = 1E-9
   maxdim = [10, 40, 80, 160]
   outputlevel = 1
-  inserter_kwargs = (; cutoff, maxdim)
+  trunc = (; cutoff, maxdim)
+  inserter_kwargs = (; trunc)
   extracter_kwargs = (;) #(; subspace_algorithm="densitymatrix", max_expand=4)
 
   @time begin

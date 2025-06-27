@@ -53,7 +53,8 @@ function quench(;
     subspace_algorithm="densitymatrix", expansion_factor=1.2, max_expand=4
   )
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
-  inserter_kwargs = (; maxdim, cutoff, normalize=true)
+  trunc = (; maxdim, cutoff)
+  inserter_kwargs = (; trunc, normalize=true)
 
   println("Calling TDVP")
   psif = ns.tdvp(
