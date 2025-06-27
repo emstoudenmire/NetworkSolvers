@@ -13,14 +13,24 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 ## To Do List
 
 - PR punchlist:
-  - [ ] Fix DMRG bug (& test TDVP etc.)
-        A previous working commit was 4742bb2e1dba
+  - [ ] Perform truncation in 1-site TDVP?
+  - [ ] Investigate slowdown / freezing of tree_dmrg example
+  - [X] Update all examples & tests to use correct kwargs:
+        - subspace_kwargs -> extracter_kwargs
+        - truncation_kwargs -> inserter_kwargs
+        - [X] Update examples
+        - [ ] Update tests
   - [ ] Have subspace expansion expand all 'previous' bonds
   - [ ] Keyword argument improvements:
         - [ ] Separate maxdim keyword for subspace_expand
         - [ ] How is nsweeps handled?
         - [ ] Are kw tuples completely separate / orthogonal?
               (e.g. do any actions rely on other actions kwargs?)
+  - [X] Test if maxdim being enforced in subspace expansion
+  - [X] Merge subspace_kwargs into expand_kwargs
+  - [X] Fix DMRG bug (& test TDVP etc.)
+        A previous working commit was 4742bb2e1dba
+  - [X] Fix 2-site TDVP bug (low fidelity of res_2site in example code)
 
 - General improvements:
     - [ ] Have subspace expansion expand all 'previous' bonds
