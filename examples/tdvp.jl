@@ -22,7 +22,8 @@ function tdvp(; N=10, total_time=1.0, time_step=0.1)
   tdvp_order = 2
   outputlevel = 0
   nsites = 1
-  inserter_kwargs = (; maxdim=60, cutoff=1E-12, normalize=true)
+  trunc = (; maxdim=60, cutoff=1E-12)
+  inserter_kwargs = (; trunc, normalize=true)
   time_range = 0.0:time_step:total_time
 
   # Using 2-site sweeping scheme
@@ -85,7 +86,8 @@ function test_tdvp(; N=6, total_time=0.5, time_step=0.02, tdvp_order=2)
   end
 
   outputlevel = 0
-  inserter_kwargs = (; maxdim=40, cutoff=1E-10, normalize=true)
+  trunc = (; maxdim=40, cutoff=1E-10)
+  inserter_kwargs = (; trunc, normalize=true)
   nsites = 2
 
   #extracter_kwargs = (; subspace_algorithm="densitymatrix", max_expand=4)

@@ -3,6 +3,11 @@ module NetworkSolvers
 using TensorOperations: TensorOperations # <-- to avoid a warning when
 # loading ITensorNetworks
 
+import ITensors as it
+import ITensorNetworks as itn
+import NamedGraphs as ng
+using Graphs: Graphs
+
 # Core solvers and linear algebra
 include("solvers/eigsolve.jl")
 include("solvers/exponentiate.jl")
@@ -16,7 +21,7 @@ include("applyexp.jl")
 include("fitting.jl")
 
 # Tensor network algorithm components
-include("defaults.jl")
+include("truncation_parameters.jl")
 include("extracter.jl")
 include("inserter.jl")
 include("subspace/subspace.jl")

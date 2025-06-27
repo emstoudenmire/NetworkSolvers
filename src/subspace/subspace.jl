@@ -6,28 +6,10 @@ default_expansion_factor() = 1.5
 default_max_expand() = typemax(Int)
 
 function subspace_expand(
-  problem,
-  local_state,
-  region_iterator;
-  cutoff=default_cutoff(),
-  maxdim=default_maxdim(),
-  mindim=default_mindim(),
-  subspace_algorithm=nothing,
-  sweep,
-  kws...,
+  problem, local_state, region_iterator; subspace_algorithm=nothing, sweep, trunc, kws...
 )
-  cutoff = get_or_last(cutoff, sweep)
-  mindim = get_or_last(mindim, sweep)
-  maxdim = get_or_last(maxdim, sweep)
   return subspace_expand(
-    Backend(subspace_algorithm),
-    problem,
-    local_state,
-    region_iterator;
-    cutoff,
-    mindim,
-    maxdim,
-    kws...,
+    Backend(subspace_algorithm), problem, local_state, region_iterator; trunc, kws...
   )
 end
 
