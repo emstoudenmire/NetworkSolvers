@@ -48,10 +48,12 @@ function quench(;
 
   outputlevel = 0
   nsites = 1
-  truncation_kwargs = (; maxdim, cutoff, normalize=true)
   nsites = 2
-  subspace_kwargs = (; algorithm="densitymatrix", expansion_factor=1.2, max_expand=4)
+  extracter_kwargs = (;
+    subspace_algorithm="densitymatrix", expansion_factor=1.2, max_expand=4
+  )
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
+  inserter_kwargs = (; maxdim, cutoff, normalize=true)
 
   println("Calling TDVP")
   psif = ns.tdvp(
@@ -60,9 +62,9 @@ function quench(;
     time_range;
     nsites,
     sweep_callback,
-    subspace_kwargs,
-    truncation_kwargs,
+    extracter_kwargs,
     updater_kwargs,
+    inserter_kwargs,
     outputlevel,
     tdvp_order,
   )

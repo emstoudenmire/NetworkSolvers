@@ -16,7 +16,7 @@ function subspace_expand(
   kws...,
 )
   region = current_region(region_iterator)
-  psi = state(problem)
+  psi = copy(state(problem))
 
   prev_vertex_set = setdiff(itn.pos(operator(problem)), region)
   (length(prev_vertex_set) != 1) && return problem, local_state

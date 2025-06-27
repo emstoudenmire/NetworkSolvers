@@ -29,14 +29,13 @@ end
 
 function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
   if outputlevel >= 1
-    psi = state(problem)
     if nsweeps >= 10
       @printf("After sweep %02d/%d ", sweep, nsweeps)
     else
       @printf("After sweep %d/%d ", sweep, nsweeps)
     end
     @printf("eigenvalue=%.12f ", eigenvalue(problem))
-    @printf("maxlinkdim=%d", itn.maxlinkdim(psi))
+    @printf("maxlinkdim=%d", itn.maxlinkdim(state(problem)))
     println()
     flush(stdout)
   end
@@ -50,7 +49,6 @@ function eigsolve(
   extracter_kwargs=(;),
   updater_kwargs=(;),
   inserter_kwargs=(;),
-  subspace_kwargs=(; algorithm="densitymatrix"),
   sweep_printer=eigsolve_sweep_printer,
   kws...,
 )
@@ -62,7 +60,6 @@ function eigsolve(
     extracter_kwargs,
     updater_kwargs,
     inserter_kwargs,
-    subspace_kwargs,
   )
   prob = sweep_solve(sweep_iter; outputlevel, sweep_printer, kws...)
   return eigenvalue(prob), state(prob)

@@ -17,39 +17,51 @@ function tdvp(; N=10, total_time=1.0, time_step=0.1)
     os += 0.5, "S-", j, "S+", j + 1
   end
   H = itn.mpo(os, s)
-  psi0 = itn.random_mps(s; link_space=16)
+  psi0 = itn.random_mps(s; link_space=60)
 
-  tdvp_order = 4
+  tdvp_order = 2
   outputlevel = 0
   nsites = 1
-  inserter_kwargs = (; maxdim=16, cutoff=1E-10, normalize=true)
+  inserter_kwargs = (; maxdim=60, cutoff=1E-12, normalize=true)
   time_range = 0.0:time_step:total_time
-
-  # Using exponentiate solver
-  updater_kwargs = (; solver=ns.exponentiate_solver)
-  res_1site = ns.tdvp(H, psi0, time_range; nsites, inserter_kwargs, tdvp_order, outputlevel)
-
-  # Using RK solver
-  updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
-  res_rk4 = ns.tdvp(
-    H, psi0, 0.0:time_step:total_time; inserter_kwargs, updater_kwargs, outputlevel
-  )
 
   # Using 2-site sweeping scheme
   nsites = 2
   updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
+  println("Calling TDVP with RK4 solver and nsites=2 (res_2site)")
   res_2site = ns.tdvp(
-    H, psi0, time_range; nsites, inserter_kwargs, updater_kwargs, outputlevel
+    H, psi0, time_range; nsites, inserter_kwargs, updater_kwargs, tdvp_order, outputlevel
   )
+  @show itn.maxlinkdim(res_2site)
 
-  @show inner(res_1site, res_2site)
+  # Using RK solver
+  updater_kwargs = (; solver=ns.runge_kutta_solver, order=4)
+  println("Calling TDVP with RK4 solver (res_rk4)")
+  res_rk4 = ns.tdvp(
+    H,
+    psi0,
+    0.0:time_step:total_time;
+    inserter_kwargs,
+    updater_kwargs,
+    tdvp_order,
+    outputlevel,
+  )
+  @show itn.maxlinkdim(res_rk4)
+
+  @show inner(res_rk4, res_2site)
+
+  # Using exponentiate solver
+  updater_kwargs = (; solver=ns.exponentiate_solver)
+  println("Calling TDVP with exponentiate solver (res_1site)")
+  res_1site = ns.tdvp(H, psi0, time_range; nsites, inserter_kwargs, tdvp_order, outputlevel)
+
   @show inner(res_1site, res_rk4)
-  @show inner(res_2site, res_rk4)
+  @show inner(res_1site, res_2site)
 
   return nothing
 end
 
-function test_tdvp(; N=4, total_time=2E-3, time_step=5E-4, tdvp_order=4)
+function test_tdvp(; N=6, total_time=0.5, time_step=0.02, tdvp_order=2)
   Random.seed!(1)
   s = itn.siteinds("S=1", N)
 
@@ -60,7 +72,7 @@ function test_tdvp(; N=4, total_time=2E-3, time_step=5E-4, tdvp_order=4)
     os += 1/2, "S-", j, "S+", j + 1
   end
   H = itn.mpo(os, s)
-  psi0 = itn.random_mps(s; link_space=8)
+  psi0 = itn.random_mps(s; link_space=30)
   psi0 = itn.truncate(psi0; cutoff=1E-12)
 
   time_range = 0.0:time_step:total_time
@@ -76,23 +88,24 @@ function test_tdvp(; N=4, total_time=2E-3, time_step=5E-4, tdvp_order=4)
   inserter_kwargs = (; maxdim=40, cutoff=1E-10, normalize=true)
   nsites = 2
 
-  #subspace_kwargs = (; algorithm="densitymatrix", max_expand=4)
-  subspace_kwargs = (;)
+  #extracter_kwargs = (; subspace_algorithm="densitymatrix", max_expand=4)
+  extracter_kwargs = (;)
 
   psi_tdvp = ns.tdvp(
     H,
     copy(psi0),
     time_range;
     nsites,
+    extracter_kwargs,
     inserter_kwargs,
     outputlevel,
     sweep_callback,
-    subspace_kwargs,
     tdvp_order,
   )
   println("\nResult from TDVP:")
   display(szs_tdvp)
   @show itn.norm(psi_tdvp)
+  @show itn.maxlinkdim(psi_tdvp)
 
   #
   # Use ED to check

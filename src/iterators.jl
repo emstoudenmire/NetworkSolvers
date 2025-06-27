@@ -82,14 +82,13 @@ function region_iterator_action(
   problem,
   region_iterator;
   extracter_kwargs=(;),
-  subspace_kwargs=(;),
   updater_kwargs=(;),
   inserter_kwargs=(;),
   sweep,
   kwargs...,
 )
   problem, local_state = extracter(
-    problem, region_iterator; extracter_kwargs..., subspace_kwargs..., sweep, kwargs...
+    problem, region_iterator; extracter_kwargs..., sweep, kwargs...
   )
   problem, local_state = updater(
     problem, local_state, region_iterator; updater_kwargs..., kwargs...
@@ -100,6 +99,6 @@ function region_iterator_action(
   return problem
 end
 
-function region_plan(problem; nsites, sweep_kwargs...)
-  return euler_sweep(state(problem); nsites, sweep_kwargs...)
+function region_plan(problem; kws...)
+  return euler_sweep(state(problem); kws...)
 end

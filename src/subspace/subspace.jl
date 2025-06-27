@@ -3,7 +3,7 @@ using NDTensors.BackendSelection: Backend, @Backend_str
 import ConstructionBase: setproperties
 
 default_expansion_factor() = 1.5
-default_max_expand() = 4
+default_max_expand() = typemax(Int)
 
 function subspace_expand(
   problem,
@@ -12,7 +12,7 @@ function subspace_expand(
   cutoff=default_cutoff(),
   maxdim=default_maxdim(),
   mindim=default_mindim(),
-  algorithm=nothing,
+  subspace_algorithm=nothing,
   sweep,
   kws...,
 )
@@ -20,7 +20,7 @@ function subspace_expand(
   mindim = get_or_last(mindim, sweep)
   maxdim = get_or_last(maxdim, sweep)
   return subspace_expand(
-    Backend(algorithm),
+    Backend(subspace_algorithm),
     problem,
     local_state,
     region_iterator;
@@ -33,7 +33,7 @@ end
 
 function subspace_expand(backend, problem, local_state, region_iterator; kws...)
   error(
-    "Subspace expansion (subspace_expand!) not defined for requested combination of algorithm and problem types",
+    "Subspace expansion (subspace_expand!) not defined for requested combination of subspace_algorithm and problem types",
   )
 end
 

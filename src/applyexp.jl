@@ -31,8 +31,7 @@ function updater(
     curr_reg = current_region(region_iterator)
     next_reg = next_region(region_iterator)
     if !isnothing(next_reg) && next_reg != curr_reg
-      seq = itn.edge_sequence_between_regions(state(T), curr_reg, next_reg)
-      next_edge = first(seq)
+      next_edge = first(itn.edge_sequence_between_regions(state(T), curr_reg, next_reg))
       v1, v2 = itn.src(next_edge), itn.dst(next_edge)
       psi = copy(state(T))
       psi[v1], R = qr(local_state, uniqueinds(local_state, psi[v2]))
@@ -53,6 +52,7 @@ function updater(
       flush(stdout)
     end
   end
+
   return T, local_state
 end
 
@@ -64,19 +64,12 @@ function applyexp(
   inserter_kwargs=(;),
   outputlevel=0,
   nsites=1,
-  subspace_kwargs=(;),
   tdvp_order=4,
   kws...,
 )
   time_steps = diff([0.0, exponents...])[2:end]
   sweep_kws = (;
-    outputlevel,
-    extracter_kwargs,
-    inserter_kwargs,
-    nsites,
-    subspace_kwargs,
-    tdvp_order,
-    updater_kwargs,
+    outputlevel, extracter_kwargs, inserter_kwargs, nsites, tdvp_order, updater_kwargs
   )
   kws_array = [(; sweep_kws..., time_step=t) for t in time_steps]
   sweep_iter = sweep_iterator(init_prob, kws_array)

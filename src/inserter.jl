@@ -17,7 +17,7 @@ function inserter(
   maxdim = get_or_last(maxdim, sweep)
 
   region = current_region(region_iterator)
-  psi = state(problem)
+  psi = copy(state(problem))
   if length(region) == 1
     C = local_tensor
   elseif length(region) == 2
