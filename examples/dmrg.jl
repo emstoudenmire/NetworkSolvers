@@ -27,10 +27,11 @@ function dmrg(; N=10, nsites=2, site_type="S=1", conserve_qns=false)
   cutoff = 1E-12
   maxdim = [10, 40, 80, 160]
   outputlevel = 1
+  trunc = (; cutoff, maxdim)
   extracter_kwargs = (;
-    cutoff, maxdim, subspace_algorithm="densitymatrix", expansion_factor=1.1
+    trunc, subspace_algorithm="densitymatrix", expansion_factor=1.1
   )
-  inserter_kwargs = (; cutoff, maxdim)
+  inserter_kwargs = (; trunc)
 
   @time begin
     energy, gs_psi = ns.dmrg(
@@ -66,9 +67,9 @@ function tree_dmrg(; conserve_qns=false)
   cutoff = 1E-9
   maxdim = 10
   outputlevel = 2
-  #extracter_kwargs = (; cutoff, maxdim, subspace_algorithm="densitymatrix", expansion_factor=1.2)
-  extracter_kwargs = (; cutoff, maxdim)
-  inserter_kwargs = (; cutoff, maxdim)
+  trunc = (; cutoff, maxdim)
+  extracter_kwargs = (;  trunc, subspace_algorithm="densitymatrix", expansion_factor=1.2)
+  inserter_kwargs = (; trunc)
   energy, gs_psi = ns.dmrg(
     H, psi; nsweeps, nsites, extracter_kwargs, inserter_kwargs, outputlevel
   )

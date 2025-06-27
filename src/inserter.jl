@@ -4,17 +4,13 @@ function inserter(
   problem,
   local_tensor,
   region_iterator;
-  cutoff=default_cutoff(),
-  maxdim=default_maxdim(),
-  mindim=default_mindim(),
   normalize=false,
   set_orthogonal_region=true,
   sweep,
+  trunc=(;),
   kws...,
 )
-  cutoff = get_or_last(cutoff, sweep)
-  mindim = get_or_last(mindim, sweep)
-  maxdim = get_or_last(maxdim, sweep)
+  trunc = truncation_parameters(sweep; trunc...)
 
   region = current_region(region_iterator)
   psi = copy(state(problem))
@@ -24,7 +20,7 @@ function inserter(
     e = ng.edgetype(psi)(first(region), last(region))
     indsTe = it.inds(psi[first(region)])
     tags = it.tags(psi, e)
-    U, C, _ = it.factorize(local_tensor, indsTe; tags, maxdim, mindim, cutoff)
+    U, C, _ = it.factorize(local_tensor, indsTe; tags, trunc...)
     itn.@preserve_graph psi[first(region)] = U
   else
     error("Region of length $(length(region)) not currently supported")

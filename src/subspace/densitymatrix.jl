@@ -7,12 +7,10 @@ function subspace_expand(
   problem,
   local_state::ITensor,
   region_iterator;
-  cutoff=default_cutoff(),
-  maxdim=default_maxdim(),
-  mindim=default_mindim(),
   north_pass=1,
   expansion_factor=default_expansion_factor(),
   max_expand=default_max_expand(),
+  trunc,
   kws...,
 )
   region = current_region(region_iterator)
@@ -33,9 +31,10 @@ function subspace_expand(
   basis_size = prod(dim.(uniqueinds(A, C)))
 
   expanded_maxdim = compute_expansion(
-    dim(a), basis_size; expansion_factor, max_expand, maxdim
+    dim(a), basis_size; expansion_factor, max_expand, trunc.maxdim
   )
   expanded_maxdim <= 0 && return problem, local_state
+  trunc = (; trunc..., maxdim=expanded_maxdim)
 
   envs = itn.environments(operator(problem))
   H = itn.operator(operator(problem))
@@ -51,11 +50,7 @@ function subspace_expand(
     sqrt_rho = conj_proj_A(sqrt_rho)
   end
   rho = sqrt_rho * dag(noprime(sqrt_rho))
-  #println("Performing densitymatrix subspace expansion")
-  #println("maxdim keyword set to ",maxdim)
-  #println("max_expand keyword set to ",max_expand)
-  #@printf("Calling eigen with: maxdim=expanded_maxdim=%d, mindim=%d, cutoff=%.3E\n",expanded_maxdim,mindim,cutoff)
-  D, U = eigen(rho; cutoff, maxdim=expanded_maxdim, mindim, ishermitian=true)
+  D, U = eigen(rho; trunc..., ishermitian=true)
 
   Uproj(T) = (T - prime(A, a)*(dag(prime(A, a))*T))
   for pass in 1:north_pass
