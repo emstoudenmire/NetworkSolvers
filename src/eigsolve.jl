@@ -27,15 +27,16 @@ function updater(
   return E, local_state
 end
 
-function eigsolve_sweep_printer(problem; outputlevel, sweep, nsweeps, kws...)
+function eigsolve_sweep_printer(region_iterator; outputlevel, sweep, nsweeps, kws...)
   if outputlevel >= 1
     if nsweeps >= 10
       @printf("After sweep %02d/%d ", sweep, nsweeps)
     else
       @printf("After sweep %d/%d ", sweep, nsweeps)
     end
-    @printf("eigenvalue=%.12f ", eigenvalue(problem))
-    @printf("maxlinkdim=%d", itn.maxlinkdim(state(problem)))
+    E = problem(region_iterator)
+    @printf("eigenvalue=%.12f ", eigenvalue(E))
+    @printf("maxlinkdim=%d", itn.maxlinkdim(state(E)))
     println()
     flush(stdout)
   end

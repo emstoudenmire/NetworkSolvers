@@ -85,16 +85,16 @@ function region_iterator_action(
   updater_kwargs=(;),
   inserter_kwargs=(;),
   sweep,
-  kwargs...,
+  kws...,
 )
   problem, local_state = extracter(
-    problem, region_iterator; extracter_kwargs..., sweep, kwargs...
+    problem, region_iterator; extracter_kwargs..., sweep, kws...
   )
   problem, local_state = updater(
-    problem, local_state, region_iterator; updater_kwargs..., kwargs...
+    problem, local_state, region_iterator; updater_kwargs..., kws...
   )
   problem = inserter(
-    problem, local_state, region_iterator; sweep, inserter_kwargs..., kwargs...
+    problem, local_state, region_iterator; sweep, inserter_kwargs..., kws...
   )
   return problem
 end

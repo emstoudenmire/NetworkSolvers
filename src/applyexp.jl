@@ -41,19 +41,22 @@ function updater(
     end
   end
 
-  if is_last_region(region_iterator)
-    curr_time = current_time(T) + 2*abs(time_step)  # currently assuming second-order method
-    T = setproperties(T; current_time=curr_time)
-    # TODO: move this to a new "applyexp_sweep_printer" function
-    if outputlevel >= 1
-      @printf("  Current time = %s, ", current_time(T))
-      @printf("maxlinkdim=%d", itn.maxlinkdim(state(T)))
-      println()
-      flush(stdout)
-    end
-  end
+  curr_time = current_time(T) + time_step
+  T = setproperties(T; current_time=curr_time)
 
   return T, local_state
+end
+
+function applyexp_sweep_printer(
+  region_iterator; outputlevel, sweep, nsweeps, process_time=identity, kws...
+)
+  if outputlevel >= 1
+    T = problem(region_iterator)
+    @printf("  Current time = %s, ", process_time(current_time(T)))
+    @printf("maxlinkdim=%d", itn.maxlinkdim(state(T)))
+    println()
+    flush(stdout)
+  end
 end
 
 function applyexp(
@@ -65,6 +68,7 @@ function applyexp(
   outputlevel=0,
   nsites=1,
   tdvp_order=4,
+  sweep_printer=applyexp_sweep_printer,
   kws...,
 )
   time_steps = diff([0.0, exponents...])[2:end]
@@ -73,7 +77,7 @@ function applyexp(
   )
   kws_array = [(; sweep_kws..., time_step=t) for t in time_steps]
   sweep_iter = sweep_iterator(init_prob, kws_array)
-  converged_prob = sweep_solve(sweep_iter; outputlevel, kws...)
+  converged_prob = sweep_solve(sweep_iter; outputlevel, sweep_printer, kws...)
   return state(converged_prob)
 end
 
@@ -84,8 +88,16 @@ function applyexp(H, init_state, exponents; kws...)
   return applyexp(init_prob, exponents; kws...)
 end
 
-function tdvp(H, init_state, time_points; time_angle=0.0, kws...)
-  z = exp(-im*time_angle)
-  exponents = [(-im*z)*t for t in time_points]
-  return applyexp(H, init_state, exponents; kws...)
+process_real_times(z) = round(-imag(z); digits=10)
+
+function tdvp(
+  H,
+  init_state,
+  time_points;
+  process_time=process_real_times,
+  sweep_printer=(a...; k...)->applyexp_sweep_printer(a...; process_time, k...),
+  kws...,
+)
+  exponents = [-im*t for t in time_points]
+  return applyexp(H, init_state, exponents; sweep_printer, kws...)
 end
