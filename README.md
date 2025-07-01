@@ -14,6 +14,7 @@ https://gist.github.com/mtfishman/fc15f9c675278efb62754b21a1cc7c7e
 
 - PR punchlist:
   - [ ] Investigate slowdown / freezing of tree_dmrg example
+  - [ ] Change fitting.jl `truncate` and `apply` to have only "expert" keywords interface
   - [ ] Have subspace expansion expand all 'previous' bonds
   - [ ] Keyword argument improvements:
         - [ ] How is nsweeps handled?

@@ -35,7 +35,7 @@ function extracter(problem::FittingProblem, region_iterator; sweep, kws...)
   local_tensor = itn.environment(tn, region)
   sequence = itn.contraction_sequence(local_tensor; alg="optimal")
   local_tensor = dag(it.contract(local_tensor; sequence))
-  problem, local_tensor = subspace_expand(problem, local_tensor, region; sweep, kws...)
+  #problem, local_tensor = subspace_expand(problem, local_tensor, region; sweep, kws...)
   return setproperties(problem; state=tn, gauge_region=region), local_tensor
 end
 
@@ -87,20 +87,22 @@ function fit_tensornetwork(tn, init_state, args...; kwargs...)
   return fit_tensornetwork(itn.inner_network(tn, init_state), args; kwargs...)
 end
 
-function itn.truncate(tn; maxdim::Int64, cutoff=0.0, kwargs...)
+function itn.truncate(tn; maxdim=default_maxdim(), cutoff=default_cutoff(), kwargs...)
   init_state = itn.ITensorNetwork(
     v -> inds -> it.delta(inds), itn.siteinds(tn); link_space=maxdim
   )
   overlap_network = itn.inner_network(tn, init_state)
-  return fit_tensornetwork(overlap_network; inserter_kwargs=(; cutoff, maxdim), kwargs...)
+  inserter_kwargs = (; trunc=(; cutoff, maxdim))
+  return fit_tensornetwork(overlap_network; inserter_kwargs, kwargs...)
 end
 
 function itn.apply(
-  A::itn.ITensorNetwork, x::itn.ITensorNetwork; maxdim::Int64, cutoff=0.0, kwargs...
+    A::itn.ITensorNetwork, x::itn.ITensorNetwork; maxdim=default_maxdim(), cutoff=default_cutoff(), kwargs...
 )
   init_state = itn.ITensorNetwork(
     v -> inds -> it.delta(inds), itn.siteinds(x); link_space=maxdim
   )
   overlap_network = itn.inner_network(x, A, init_state)
-  return fit_tensornetwork(overlap_network; inserter_kwargs=(; cutoff, maxdim), kwargs...)
+  inserter_kwargs = (; trunc=(; cutoff, maxdim))
+  return fit_tensornetwork(overlap_network; inserter_kwargs, kwargs...)
 end
