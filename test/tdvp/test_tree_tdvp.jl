@@ -50,13 +50,12 @@ end
   nsweeps = 5
 
   nsites = 2
-  E, gs_psi = ns.dmrg(
-    H, psi0; inserter_kwargs=(; cutoff, maxdim), nsites, nsweeps, outputlevel
-  )
+  trunc = (; cutoff, maxdim)
+  E, gs_psi = ns.dmrg(H, psi0; inserter_kwargs=(; trunc), nsites, nsweeps, outputlevel)
   (outputlevel >= 1) && println("2-site DMRG energy = ", E)
   @show itn.maxlinkdim(gs_psi)
 
-  inserter_kwargs=(; cutoff=1E-12, maxdim)
+  inserter_kwargs=(; trunc)
   nsites = 1
   tmax = 0.10
   time_range = 0.0:0.02:tmax
