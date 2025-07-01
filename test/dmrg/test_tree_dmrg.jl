@@ -46,16 +46,9 @@ include("../utilities/tree_graphs.jl")
   # Test 2-site DMRG without subspace expansion
   #
   nsites = 2
-  subspace_kwargs = (;)#(; algorithm="densitymatrix")
-  E, psi = ns.dmrg(
-    H,
-    psi0;
-    truncation_kwargs=(; cutoff, maxdim),
-    nsites,
-    nsweeps,
-    subspace_kwargs,
-    outputlevel,
-  )
+  trunc = (; cutoff, maxdim)
+  inserter_kwargs = (; trunc)
+  E, psi = ns.dmrg(H, psi0; inserter_kwargs, nsites, nsweeps, outputlevel)
   (outputlevel >= 1) && println("2-site DMRG energy = ", E)
   @test abs(E-Ex) < 1E-5
 
@@ -64,18 +57,12 @@ include("../utilities/tree_graphs.jl")
   #
   nsites = 1
   nsweeps = 5
-  subspace_kwargs = (; algorithm="densitymatrix", max_expand=8)
+  trunc = (; cutoff, maxdim)
+  extracter_kwargs = (; trunc, subspace_algorithm="densitymatrix")
+  inserter_kwargs = (; trunc)
   cutoff = 1E-10
   maxdim = 200
-  E, psi = ns.dmrg(
-    H,
-    psi0;
-    truncation_kwargs=(; cutoff, maxdim),
-    nsites,
-    nsweeps,
-    subspace_kwargs,
-    outputlevel,
-  )
+  E, psi = ns.dmrg(H, psi0; extracter_kwargs, inserter_kwargs, nsites, nsweeps, outputlevel)
   (outputlevel >= 1) && println("1-site+subspace DMRG energy = ", E)
   @test abs(E-Ex) < 1E-5
 end
