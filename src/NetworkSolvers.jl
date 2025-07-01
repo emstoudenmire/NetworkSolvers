@@ -9,9 +9,9 @@ import NamedGraphs as ng
 using Graphs: Graphs
 
 # Core solvers and linear algebra
-include("solvers/eigsolve.jl")
-include("solvers/exponentiate.jl")
-include("solvers/runge_kutta.jl")
+include("local_solvers/eigsolve.jl")
+include("local_solvers/exponentiate.jl")
+include("local_solvers/runge_kutta.jl")
 include("sketched_linear_algebra/range_finder.jl")
 include("operator_map.jl")
 
