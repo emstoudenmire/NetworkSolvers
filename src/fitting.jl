@@ -97,7 +97,11 @@ function itn.truncate(tn; maxdim=default_maxdim(), cutoff=default_cutoff(), kwar
 end
 
 function itn.apply(
-    A::itn.ITensorNetwork, x::itn.ITensorNetwork; maxdim=default_maxdim(), cutoff=default_cutoff(), kwargs...
+  A::itn.ITensorNetwork,
+  x::itn.ITensorNetwork;
+  maxdim=default_maxdim(),
+  cutoff=default_cutoff(),
+  kwargs...,
 )
   init_state = itn.ITensorNetwork(
     v -> inds -> it.delta(inds), itn.siteinds(x); link_space=maxdim
