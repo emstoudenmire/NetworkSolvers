@@ -1,7 +1,7 @@
 name = "NetworkSolvers"
 uuid = "31404548-2b48-4190-b5cd-dc6b4eddfaec"
 authors = ["ITensor developers <support@itensor.org> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
@@ -24,4 +24,5 @@ ITensors = "0.7, 0.8, 0.9"
 IterTools = "1.10.0"
 KrylovKit = "0.6, 0.7, 0.8"
 NamedGraphs = "0.6.8"
+TensorOperations = "5"
 julia = "1.10"
